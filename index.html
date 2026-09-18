@@ -1,0 +1,1556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="pageTitle">Aryan Doors · Technical & Site Survey Form</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, system-ui, sans-serif; }
+        body { background: #e6e9ef; padding: 30px 20px; display: flex; justify-content: center; align-items: center; }
+        .form-container { max-width: 1400px; width: 100%; background: white; border-radius: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.15); padding: 30px 35px 45px; border: 1px solid #cbd5e1; }
+
+        /* ===== LOGIN SCREEN ===== */
+        .login-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(135deg, #1e3a5f 0%, #0b2a41 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 99999;
+            padding: 20px;
+        }
+        .login-overlay.hidden { display: none; }
+        .login-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.35);
+            padding: 40px 45px 35px;
+            width: 100%;
+            max-width: 420px;
+            border: 1px solid #cbd5e1;
+        }
+        .login-card .login-logo {
+            text-align: center;
+            margin-bottom: 22px;
+        }
+        .login-card .login-logo img {
+            height: 60px;
+            width: auto;
+            max-width: 200px;
+            object-fit: contain;
+        }
+        .login-card h2 {
+            font-size: 1.4rem;
+            color: #0b2a41;
+            text-align: center;
+            margin-bottom: 6px;
+            letter-spacing: 0.5px;
+        }
+        .login-card .login-sub {
+            text-align: center;
+            color: #64748b;
+            font-size: 0.85rem;
+            margin-bottom: 24px;
+            font-style: italic;
+        }
+        .login-card .login-field {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 16px;
+        }
+        .login-card .login-field label {
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: #1e3a5f;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+        .login-card .login-field input {
+            padding: 12px 14px;
+            border: 1.5px solid #b8c9dd;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-family: inherit;
+            background: #f9fcff;
+            transition: 0.15s;
+        }
+        .login-card .login-field input:focus {
+            outline: none;
+            border-color: #1e3a5f;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(30,58,95,0.15);
+        }
+        .login-card .login-btn {
+            width: 100%;
+            padding: 14px;
+            background: #1e3a5f;
+            color: white;
+            border: none;
+            border-radius: 40px;
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            margin-top: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: 0.2s;
+        }
+        .login-card .login-btn:hover { background: #0f2a44; transform: translateY(-1px); }
+        .login-card .login-error {
+            color: #b91c1c;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-align: center;
+            margin-top: 10px;
+            min-height: 18px;
+        }
+        .login-card .login-footer {
+            text-align: center;
+            font-size: 0.72rem;
+            color: #94a3b8;
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 1px dashed #cbd5e1;
+            line-height: 1.5;
+        }
+        .login-card .login-footer strong { color: #1e3a5f; }
+
+        /* ===== Header / Footer image placeholders (screen) ===== */
+        .print-header-images { display: flex; justify-content: space-between; align-items: center; gap: 15px; margin-bottom: 12px; flex-wrap: wrap; }
+        .print-header-images .logo-left  { height: 70px; width: auto; max-width: 200px; object-fit: contain; }
+        .print-header-images .photo-right { height: 70px; width: auto; max-width: 220px; object-fit: contain; }
+        .print-footer-image { display: flex; justify-content: center; align-items: center; margin-top: 18px; }
+        .print-footer-image img { max-height: 55px; width: auto; max-width: 100%; object-fit: contain; }
+
+        /* Watermark layer — hidden on screen, shown in print */
+        .print-watermark { display: none; }
+
+        .brand-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #1e3a5f; padding-bottom: 18px; margin-bottom: 25px; flex-wrap: wrap; gap: 12px; }
+        .brand-header h1 { font-size: 2.2rem; letter-spacing: 3px; font-weight: 700; color: #0b2a41; line-height: 1.2; }
+        .brand-header h1 small { font-size: 0.9rem; letter-spacing: 1px; font-weight: 400; color: #2c5f8a; display: block; margin-top: 6px; }
+        .entry-id-badge { background: #1e3a5f; color: white; padding: 10px 22px; border-radius: 40px; font-weight: 600; font-size: 1.1rem; box-shadow: 0 4px 10px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 10px; border: 1px solid #a0c0e0; }
+        .entry-id-badge i { font-size: 1.3rem; }
+        #entryIdDisplay { background: #f8fafc; padding: 6px 18px; border-radius: 30px; color: #0b2a41; font-family: monospace; font-size: 1.2rem; font-weight: 700; letter-spacing: 1px; border: 1px solid #94a3b8; }
+        .section { background: #f9fcff; border-radius: 18px; padding: 22px 25px; margin-bottom: 28px; border: 1px solid #d0ddee; box-shadow: 0 2px 6px rgba(0,0,0,0.02); }
+        .section-title { font-size: 1.3rem; font-weight: 700; color: #0b2a41; margin-bottom: 18px; border-left: 8px solid #1e3a5f; padding-left: 18px; background: linear-gradient(to right, #e8f0fa, transparent); letter-spacing: 0.3px; display: flex; align-items: center; gap: 10px; }
+        .section-title i { color: #2c5f8a; font-size: 1.2rem; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 28px; }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px 20px; }
+        .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px 18px; }
+        .field-group { display: flex; flex-direction: column; margin-bottom: 6px; min-width: 0; }
+        .field-group label { font-weight: 600; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.4px; color: #2c3e50; margin-bottom: 5px; }
+        .field-group input, .field-group select, .field-group textarea { padding: 10px 14px; border: 1px solid #b8c9dd; border-radius: 10px; font-size: 0.95rem; background: white; transition: 0.15s; width: 100%; font-family: inherit; }
+        .field-group textarea, .auto-textarea { resize: vertical; min-height: 40px; line-height: 1.4; overflow-wrap: break-word; word-wrap: break-word; white-space: pre-wrap; }
+        .field-group input:focus, .field-group select:focus, .field-group textarea:focus { border-color: #1e3a5f; outline: none; box-shadow: 0 0 0 3px rgba(30,58,95,0.15); }
+        .checkbox-row { display: flex; flex-wrap: wrap; gap: 12px 25px; align-items: center; margin: 8px 0 6px; }
+        .checkbox-row label { display: flex; align-items: center; gap: 8px; font-weight: 500; font-size: 0.92rem; text-transform: none; letter-spacing: normal; color: #1e2e44; cursor: pointer; background: #ffffff; padding: 5px 14px 5px 10px; border-radius: 30px; border: 1px solid #ced9e8; transition: 0.1s; }
+        .checkbox-row label:hover { background: #eef4fc; border-color: #8fb1d1; }
+        .checkbox-row label.other-ticked { background: #fff7e0; border-color: #d4a72c; }
+        .checkbox-row input[type="checkbox"] { width: 18px; height: 18px; accent-color: #1e3a5f; margin-right: 4px; }
+        .other-input-wrap { display: none; margin-top: 8px; width: 100%; }
+        .other-input-wrap.show { display: block; }
+        .other-input-wrap input { width: 100%; padding: 8px 14px; border: 1px dashed #d4a72c; border-radius: 10px; background: #fffdf5; font-size: 0.92rem; color: #1e2e44; }
+        .other-input-wrap input:focus { border-style: solid; border-color: #b8860b; background: #fffbe8; outline: none; }
+        .inline-options { display: flex; flex-wrap: wrap; gap: 10px 24px; align-items: center; padding: 4px 0; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin: 12px 0; table-layout: fixed; }
+        th { background: #d9e5f2; color: #0b2a41; font-weight: 700; padding: 12px 8px; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.3px; border: 1px solid #b8c9dd; word-wrap: break-word; }
+        td { border: 1px solid #cbd7e8; padding: 10px 8px; vertical-align: top; word-wrap: break-word; overflow-wrap: break-word; }
+        .remarks-input { width: 100%; padding: 8px 10px; border: 1px solid #b8c9dd; border-radius: 8px; font-size: 0.9rem; font-family: inherit; resize: vertical; min-height: 38px; line-height: 1.4; overflow-wrap: break-word; word-wrap: break-word; white-space: pre-wrap; overflow: hidden; }
+        .param-name-input { width: 100%; padding: 6px 8px; border: 1px dashed #94a3b8; border-radius: 6px; font-size: 0.85rem; font-weight: 600; font-family: inherit; background: #fefefe; color: #0b2a41; resize: vertical; min-height: 34px; line-height: 1.35; overflow: hidden; overflow-wrap: break-word; word-wrap: break-word; white-space: pre-wrap; }
+        .param-name-input:focus { border-style: solid; border-color: #1e3a5f; background: #f0f7ff; outline: none; }
+        .large-textarea { width: 100%; padding: 14px 16px; border: 1px solid #b8c9dd; border-radius: 14px; min-height: 90px; font-size: 0.95rem; resize: vertical; font-family: inherit; line-height: 1.4; overflow-wrap: break-word; word-wrap: break-word; white-space: pre-wrap; overflow: hidden; }
+        .btn-group { display: flex; flex-wrap: wrap; gap: 18px; justify-content: center; margin: 40px 0 10px; }
+        .btn { border: none; padding: 16px 34px; font-size: 1.05rem; font-weight: 700; border-radius: 60px; cursor: pointer; display: inline-flex; align-items: center; gap: 12px; transition: 0.2s; box-shadow: 0 8px 16px rgba(0,0,0,0.08); letter-spacing: 0.4px; }
+        .btn-print { background: #8b5cf6; color: white; }
+        .btn-print:hover { background: #6d28d9; transform: translateY(-2px); }
+        .btn-primary { background: #1e3a5f; color: white; }
+        .btn-primary:hover { background: #0f2a44; transform: translateY(-2px); }
+        .btn-secondary { background: white; color: #1e3a5f; border: 2px solid #1e3a5f; }
+        .btn-secondary:hover { background: #e8f0fa; transform: translateY(-2px); }
+        .btn-submit { background: #0f7b3e; color: white; }
+        .btn-submit:hover { background: #0a5c2e; transform: translateY(-2px); }
+        .btn-submit:disabled { background: #8bb79b; cursor: not-allowed; transform: none; }
+        .btn-logout { background: #b91c1c; color: white; }
+        .btn-logout:hover { background: #7f1d1d; transform: translateY(-2px); }
+        .footer-note { text-align: right; margin-top: 25px; font-style: italic; color: #4b6589; font-weight: 500; border-top: 1px solid #cbd5e1; padding-top: 18px; }
+        .footer-note.disclaimer-note { text-align: justify; text-align-last: right; margin-top: 12px; font-style: italic; font-size: 0.82rem; color: #4b6589; font-weight: 500; border-top: 1px dashed #cbd5e1; padding-top: 12px; line-height: 1.5; }
+        .status-toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: #0f7b3e; color: white; padding: 14px 32px; border-radius: 40px; font-weight: 600; box-shadow: 0 10px 30px rgba(0,0,0,0.2); transition: transform 0.4s ease; z-index: 99999; display: flex; align-items: center; gap: 10px; }
+        .status-toast.show { transform: translateX(-50%) translateY(0); }
+        .status-toast.error { background: #b91c1c; }
+        .status-toast.info { background: #1e3a5f; }
+        .door-type-block { margin-bottom: 22px; border-left: 4px solid #1e3a5f; padding-left: 14px; }
+        .door-type-block.d2 { border-left-color: #2c5f8a; }
+        .door-type-block.d3 { border-left-color: #4a7a9c; }
+        .door-type-title { font-size: 1.1rem; color: #0b2a41; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .door-type-title .badge { background: #1e3a5f; color: white; padding: 3px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; }
+        .door-type-title .badge.d2 { background: #2c5f8a; }
+        .door-type-title .badge.d3 { background: #4a7a9c; }
+        .door-type-name-input { flex: 1; min-width: 200px; padding: 6px 14px; border: 1px dashed #94a3b8; border-radius: 8px; font-size: 1.1rem; font-weight: 700; color: #0b2a41; background: #fefefe; font-family: inherit; letter-spacing: 0.3px; }
+        .door-type-name-input:focus { border-style: solid; border-color: #1e3a5f; background: #f0f7ff; outline: none; }
+        .table-section-header td { background: #e8f0fa; color: #0b2a41; font-weight: 700; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; padding: 8px 10px; border: 1px solid #b8c9dd; }
+        .common-remarks-section { background: linear-gradient(135deg, #f0f7ff, #e8f0fa); border: 2px solid #1e3a5f; border-radius: 18px; padding: 24px 28px; margin-bottom: 28px; }
+        .common-remarks-section .section-title { border-left-color: #d4a72c; background: linear-gradient(to right, #fff7e0, transparent); }
+        .common-remarks-section .section-title i { color: #b8860b; }
+        .common-remarks-textarea { width: 100%; padding: 16px 18px; border: 2px solid #1e3a5f; border-radius: 14px; min-height: 120px; font-size: 1rem; font-family: inherit; line-height: 1.5; resize: vertical; background: white; color: #0b2a41; overflow-wrap: break-word; word-wrap: break-word; white-space: pre-wrap; overflow: hidden; }
+        .common-remarks-textarea:focus { outline: none; box-shadow: 0 0 0 4px rgba(30,58,95,0.15); border-color: #0f2a44; }
+        .common-remarks-textarea::placeholder { color: #94a3b8; font-style: italic; }
+
+        /* ===== Sheet Entry Summary (collapsible) ===== */
+        .sheet-entry-summary { margin-top: 14px; border: 1.5px solid #94a3b8; border-radius: 12px; overflow: hidden; background: #ffffff; }
+        .sheet-entry-summary.d1 { border-color: #1e3a5f; }
+        .sheet-entry-summary.d2 { border-color: #2c5f8a; }
+        .sheet-entry-summary.d3 { border-color: #4a7a9c; }
+        .sheet-entry-toggle { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 16px; background: #eef4fc; cursor: pointer; user-select: none; font-weight: 700; font-size: 0.9rem; color: #0b2a41; letter-spacing: 0.3px; transition: 0.15s; }
+        .sheet-entry-toggle:hover { background: #dce8f6; }
+        .sheet-entry-summary.d1 .sheet-entry-toggle { background: #dbe8f7; }
+        .sheet-entry-summary.d2 .sheet-entry-toggle { background: #e0eef7; }
+        .sheet-entry-summary.d3 .sheet-entry-toggle { background: #e6f1f7; }
+        .sheet-entry-toggle .label { display: flex; align-items: center; gap: 8px; }
+        .sheet-entry-toggle .label i { color: #2c5f8a; }
+        .sheet-entry-toggle .chevron { transition: transform 0.25s ease; font-size: 0.85rem; color: #2c5f8a; }
+        .sheet-entry-summary.open .chevron { transform: rotate(180deg); }
+        .sheet-entry-body { display: none; padding: 14px 16px 16px; background: #fbfdff; border-top: 1px solid #cbd7e8; }
+        .sheet-entry-summary.open .sheet-entry-body { display: block; }
+        .sheet-entry-output { width: 100%; padding: 12px 14px; border: 1.5px solid #94a3b8; border-radius: 10px; font-family: 'Consolas', 'Monaco', 'Courier New', monospace; font-size: 0.88rem; line-height: 1.6; min-height: 90px; resize: vertical; background: #ffffff; color: #0b2a41; white-space: pre-wrap; overflow-wrap: break-word; word-wrap: break-word; }
+        .sheet-entry-output:focus { outline: none; border-color: #1e3a5f; box-shadow: 0 0 0 3px rgba(30,58,95,0.12); }
+        .sheet-entry-actions { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+        .sheet-entry-btn { padding: 8px 16px; font-size: 0.85rem; font-weight: 600; border-radius: 30px; border: 1.5px solid #1e3a5f; background: white; color: #1e3a5f; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: 0.15s; letter-spacing: 0.3px; font-family: inherit; }
+        .sheet-entry-btn:hover { background: #1e3a5f; color: white; }
+        .sheet-entry-btn.copied { background: #0f7b3e; color: white; border-color: #0f7b3e; }
+        .sheet-entry-hint { margin-top: 8px; font-size: 0.78rem; color: #64748b; font-style: italic; }
+
+        @media (max-width: 900px) {
+            .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+            .form-container { padding: 20px; }
+            .brand-header h1 { font-size: 1.7rem; }
+            .btn { padding: 14px 24px; font-size: 0.98rem; }
+            .print-header-images .logo-left,
+            .print-header-images .photo-right { height: 50px; }
+        }
+
+        /* ===== PAGE SETUP: A4 ===== */
+        @page {
+            size: A4 portrait;
+            margin: 12mm 8mm 12mm 8mm;
+        }
+
+        @media print {
+            * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+
+            html, body {
+                background: white !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                display: block !important;
+                width: 100% !important;
+                font-size: 9pt;
+            }
+
+            .form-container {
+                box-shadow: none !important;
+                border: none !important;
+                border-radius: 0 !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                max-width: 100% !important;
+                width: 100% !important;
+                background: transparent !important;
+                position: relative;
+                z-index: 1;
+            }
+
+            /* Hide on-screen header/footer images */
+            .print-header-images,
+            .print-footer-image { display: none !important; }
+
+            /* Hide login screen when printing */
+            .login-overlay { display: none !important; }
+
+            /* ===== WATERMARK LAYER ===== */
+            .print-watermark {
+                display: block !important;
+                position: fixed;
+                top: 0; left: 0; right: 0; bottom: 0;
+                width: 100%;
+                height: 100%;
+                pointer-events: none;
+                z-index: 0;
+                opacity: 0.09;
+            }
+
+            /* ARYAN logo — 3 full-page placements (top, middle, bottom) */
+            .print-watermark .wm-logo { display: block !important; position: absolute; left: 50%; transform: translateX(-50%); width: 100%; height: 33.333%; object-fit: contain; padding: 6mm; }
+            .print-watermark .wm-logo.top    { top: 0; }
+            .print-watermark .wm-logo.middle { top: 33.333%; }
+            .print-watermark .wm-logo.bottom { top: 66.666%; }
+
+            /* Project photo — top-right corner */
+            .print-watermark .wm-photo {
+                display: block !important;
+                position: absolute;
+                top: 10mm;
+                right: 10mm;
+                width: 45mm;
+                height: auto;
+                object-fit: contain;
+                opacity: 1;
+            }
+
+            /* Footer banner — bottom centre */
+            .print-watermark .wm-banner {
+                display: block !important;
+                position: absolute;
+                bottom: 8mm;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 140mm;
+                height: auto;
+                object-fit: contain;
+                opacity: 1;
+            }
+
+            /* ===== Hide action buttons and toasts ===== */
+            .btn-group, .status-toast, .other-input-wrap,
+            .entry-id-badge i, .sheet-entry-actions, .sheet-entry-hint { display: none !important; }
+
+            /* ===== Brand header (compact) ===== */
+            .brand-header {
+                border-bottom: 1.5px solid #1e3a5f !important;
+                margin-bottom: 6px !important;
+                padding-bottom: 4px !important;
+                page-break-after: avoid;
+                break-after: avoid;
+            }
+            .brand-header h1 { font-size: 13pt !important; letter-spacing: 1.5px !important; line-height: 1.15 !important; }
+            .brand-header h1 small { font-size: 7pt !important; margin-top: 1px !important; }
+            .entry-id-badge { font-size: 8pt !important; padding: 3px 10px !important; border-radius: 14px !important; }
+            #entryIdDisplay { font-size: 8.5pt !important; padding: 2px 8px !important; }
+
+            /* ===== Sections ===== */
+            .section {
+                background: white !important;
+                border: 1px solid #b8c9dd !important;
+                border-radius: 4px !important;
+                padding: 6px 8px !important;
+                margin-bottom: 6px !important;
+                page-break-inside: auto;
+                break-inside: auto;
+            }
+            .section-title {
+                font-size: 9.5pt !important;
+                margin-bottom: 5px !important;
+                border-left: 4px solid #1e3a5f !important;
+                padding: 2px 6px !important;
+                background: #e8f0fa !important;
+                page-break-after: avoid;
+                break-after: avoid;
+            }
+            .section-title i { display: none !important; }
+
+            /* ===== Grids ===== */
+            .grid-2, .grid-3, .grid-4 { gap: 3px 8px !important; }
+            .field-group { margin-bottom: 2px !important; }
+            .field-group label { font-size: 6.5pt !important; margin-bottom: 0 !important; color: #1e3a5f !important; letter-spacing: 0.2px !important; }
+
+            /* ===== Inputs ===== */
+            .field-group input,
+            .field-group select,
+            .field-group textarea,
+            .remarks-input,
+            .large-textarea,
+            .param-name-input,
+            .door-type-name-input,
+            .common-remarks-textarea {
+                border: none !important;
+                border-bottom: 0.5px solid #94a3b8 !important;
+                border-radius: 0 !important;
+                padding: 1px 2px !important;
+                font-size: 7.5pt !important;
+                background: transparent !important;
+                color: #000 !important;
+                box-shadow: none !important;
+                -webkit-appearance: none;
+                appearance: none;
+                min-height: 0 !important;
+                max-height: none !important;
+                resize: none !important;
+                overflow: visible !important;
+                height: auto !important;
+                width: 100% !important;
+                line-height: 1.2 !important;
+                white-space: pre-wrap !important;
+                word-wrap: break-word !important;
+                scrollbar-width: none !important;
+                -ms-overflow-style: none !important;
+                field-sizing: content !important;
+            }
+            input::-webkit-scrollbar,
+            textarea::-webkit-scrollbar,
+            .sheet-entry-output::-webkit-scrollbar,
+            .common-remarks-textarea::-webkit-scrollbar { display: none !important; width: 0 !important; height: 0 !important; }
+
+            .param-name-input { font-weight: 700 !important; }
+            .door-type-name-input { font-weight: 700 !important; font-size: 9pt !important; padding: 0 !important; }
+            textarea { overflow: visible !important; height: auto !important; }
+
+            /* ===== Checkboxes ===== */
+            .checkbox-row { gap: 2px 6px !important; margin: 1px 0 !important; }
+            .checkbox-row label {
+                padding: 1px 5px !important;
+                font-size: 6.5pt !important;
+                background: #f4f7fc !important;
+                border: 0.5px solid #c1d5ea !important;
+                border-radius: 8px !important;
+                color: #1e3a5f !important;
+            }
+            .checkbox-row label.other-ticked { background: #fff7e0 !important; border-color: #d4a72c !important; }
+            .checkbox-row input[type="checkbox"] { width: 10px !important; height: 10px !important; margin-right: 2px !important; }
+            .inline-options { gap: 2px 6px !important; }
+            .inline-options label { font-size: 6.5pt !important; }
+
+            /* ===== Tables ===== */
+            table {
+                font-size: 7pt !important;
+                margin: 3px 0 !important;
+                page-break-inside: auto !important;
+                break-inside: auto !important;
+            }
+            thead { display: table-header-group !important; }
+            tfoot { display: table-footer-group !important; }
+            tr { page-break-inside: avoid !important; break-inside: avoid !important; }
+            th {
+                font-size: 6.5pt !important;
+                padding: 2px 3px !important;
+                background: #d9e5f2 !important;
+                color: #0b2a41 !important;
+                border: 0.5px solid #94a3b8 !important;
+                line-height: 1.15 !important;
+            }
+            td {
+                padding: 1.5px 3px !important;
+                border: 0.5px solid #94a3b8 !important;
+                font-size: 7pt !important;
+                line-height: 1.2 !important;
+            }
+            .table-section-header td {
+                background: #e8f0fa !important;
+                font-size: 6.5pt !important;
+                padding: 1.5px 4px !important;
+            }
+
+            /* ===== Footer notes ===== */
+            .footer-note {
+                font-size: 7pt !important;
+                margin-top: 5px !important;
+                padding-top: 3px !important;
+                border-top: 0.5px solid #94a3b8 !important;
+                page-break-before: avoid;
+            }
+            .footer-note.disclaimer-note {
+                font-size: 6.5pt !important;
+                line-height: 1.3 !important;
+                page-break-inside: avoid;
+                break-inside: avoid;
+                border-top: 0.5px dashed #94a3b8 !important;
+                margin-top: 3px !important;
+                padding-top: 3px !important;
+            }
+            .section-title + * { page-break-before: avoid; }
+
+            /* ===== Door type blocks ===== */
+            .door-type-block {
+                page-break-inside: auto;
+                break-inside: auto;
+                margin-bottom: 8px !important;
+                padding-left: 6px !important;
+                border-left-width: 3px !important;
+            }
+            .door-type-title { margin-bottom: 4px !important; font-size: 9pt !important; }
+            .door-type-title .badge { font-size: 7pt !important; padding: 1px 6px !important; }
+
+            /* ===== Common Remarks ===== */
+            .common-remarks-section {
+                background: white !important;
+                border: 1.5px solid #1e3a5f !important;
+                border-radius: 4px !important;
+                padding: 6px 8px !important;
+                margin-bottom: 6px !important;
+                page-break-inside: auto;
+                break-inside: auto;
+                height: auto !important;
+                max-height: none !important;
+                overflow: visible !important;
+            }
+            .common-remarks-textarea {
+                border: 0.5px solid #94a3b8 !important;
+                border-radius: 0 !important;
+                padding: 3px 4px !important;
+                font-size: 8pt !important;
+                min-height: 40px !important;
+                max-height: none !important;
+                height: auto !important;
+                resize: none !important;
+                overflow: visible !important;
+                overflow-x: visible !important;
+                overflow-y: visible !important;
+                white-space: pre-wrap !important;
+                word-wrap: break-word !important;
+                overflow-wrap: break-word !important;
+                background: transparent !important;
+                color: #000 !important;
+                scrollbar-width: none !important;
+                -ms-overflow-style: none !important;
+                field-sizing: content !important;
+            }
+
+            /* ===== Sheet Entry Summary ===== */
+            .sheet-entry-summary {
+                display: block !important;
+                border: none !important;
+                border-top: 0.5px solid #94a3b8 !important;
+                border-radius: 0 !important;
+                margin-top: 4px !important;
+                padding-top: 3px !important;
+                background: transparent !important;
+                overflow: visible !important;
+                page-break-inside: auto;
+                break-inside: auto;
+                height: auto !important;
+                max-height: none !important;
+            }
+            .sheet-entry-toggle {
+                display: block !important;
+                padding: 1px 0 !important;
+                font-size: 7pt !important;
+                font-weight: 700 !important;
+                background: transparent !important;
+                color: #1e3a5f !important;
+                border: none !important;
+                cursor: default !important;
+                text-transform: uppercase !important;
+                letter-spacing: 0.3px !important;
+                margin-bottom: 1px !important;
+            }
+            .sheet-entry-toggle .chevron { display: none !important; }
+            .sheet-entry-toggle .label { display: inline !important; }
+            .sheet-entry-toggle .label i { display: none !important; }
+
+            .sheet-entry-summary .sheet-entry-body,
+            .sheet-entry-summary.open .sheet-entry-body {
+                display: block !important;
+                visibility: visible !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                background: transparent !important;
+                border: none !important;
+                overflow: visible !important;
+                height: auto !important;
+                max-height: none !important;
+            }
+
+            .sheet-entry-output {
+                display: block !important;
+                border: none !important;
+                border-radius: 0 !important;
+                font-size: 7pt !important;
+                line-height: 1.25 !important;
+                min-height: 0 !important;
+                max-height: none !important;
+                height: auto !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                background: transparent !important;
+                color: #000 !important;
+                font-family: 'Segoe UI', Roboto, sans-serif !important;
+                resize: none !important;
+                overflow: visible !important;
+                overflow-x: visible !important;
+                overflow-y: visible !important;
+                white-space: pre-wrap !important;
+                word-wrap: break-word !important;
+                overflow-wrap: break-word !important;
+                -webkit-appearance: none !important;
+                -moz-appearance: none !important;
+                appearance: none !important;
+                scrollbar-width: none !important;
+                -ms-overflow-style: none !important;
+                field-sizing: content !important;
+            }
+
+            body { padding: 0 !important; }
+            .form-container { padding: 0 !important; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ===== LOGIN SCREEN ===== -->
+<div class="login-overlay" id="loginOverlay">
+    <div class="login-card">
+        <div class="login-logo">
+            <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='60'><rect width='200' height='60' fill='%23ffffff' stroke='%231e3a5f' stroke-width='2'/><text x='50%25' y='58%25' text-anchor='middle' font-family='Arial' font-size='16' font-weight='bold' fill='%231e3a5f'>ARYAN LOGO</text></svg>" alt="Aryan Logo">
+        </div>
+        <h2>ARYAN DOORS</h2>
+        <p class="login-sub">Technical & Site Survey Form</p>
+        <form id="loginForm" onsubmit="return handleLogin(event)">
+            <div class="login-field">
+                <label for="loginUser">Username</label>
+                <input type="text" id="loginUser" placeholder="Enter username" autocomplete="username" required>
+            </div>
+            <div class="login-field">
+                <label for="loginPass">Password</label>
+                <input type="password" id="loginPass" placeholder="Enter password" autocomplete="current-password" required>
+            </div>
+            <button type="submit" class="login-btn"><i class="fas fa-sign-in-alt"></i> Login</button>
+            <div class="login-error" id="loginError"></div>
+        </form>
+        <div class="login-footer">
+            Authorised access only. Contact <strong>Rupesh Vaidya</strong> for credentials.
+        </div>
+    </div>
+</div>
+
+<div class="form-container" id="surveyFormContainer">
+
+    <!-- ===== PRINT-ONLY WATERMARK LAYER ===== -->
+    <div class="print-watermark" aria-hidden="true">
+        <!-- ARYAN logo — 3 full-page placements: top, middle, bottom -->
+        <img class="wm-logo top"    src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='800' height='300'><text x='50%25' y='55%25' text-anchor='middle' dominant-baseline='middle' font-family='Arial' font-size='110' font-weight='bold' fill='%231e3a5f'>ARYAN</text><text x='50%25' y='78%25' text-anchor='middle' dominant-baseline='middle' font-family='Arial' font-size='60' font-weight='bold' fill='%231e3a5f'>DOORS</text></svg>" alt="">
+        <img class="wm-logo middle" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='800' height='300'><text x='50%25' y='55%25' text-anchor='middle' dominant-baseline='middle' font-family='Arial' font-size='110' font-weight='bold' fill='%231e3a5f'>ARYAN</text><text x='50%25' y='78%25' text-anchor='middle' dominant-baseline='middle' font-family='Arial' font-size='60' font-weight='bold' fill='%231e3a5f'>DOORS</text></svg>" alt="">
+        <img class="wm-logo bottom" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='800' height='300'><text x='50%25' y='55%25' text-anchor='middle' dominant-baseline='middle' font-family='Arial' font-size='110' font-weight='bold' fill='%231e3a5f'>ARYAN</text><text x='50%25' y='78%25' text-anchor='middle' dominant-baseline='middle' font-family='Arial' font-size='60' font-weight='bold' fill='%231e3a5f'>DOORS</text></svg>" alt="">
+        <!-- Project photo — top right corner -->
+        <img class="wm-photo" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='60'><rect width='200' height='60' fill='%23ffffff' stroke='%231e3a5f' stroke-width='2'/><text x='50%25' y='58%25' text-anchor='middle' font-family='Arial' font-size='14' font-weight='bold' fill='%231e3a5f'>PROJECT PHOTO</text></svg>" alt="">
+        <!-- Footer banner — bottom centre -->
+        <img class="wm-banner" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='700' height='40'><rect width='700' height='40' fill='%23ffffff' stroke='%231e3a5f' stroke-width='1'/><text x='50%25' y='62%25' text-anchor='middle' font-family='Arial' font-size='13' font-weight='bold' fill='%231e3a5f'>ARYAN DOORS — TECHNICAL SURVEY FORM — www.aryandoors.com</text></svg>" alt="">
+    </div>
+
+    <!-- ===== ON-SCREEN HEADER IMAGES (top-left logo, top-right photo) ===== -->
+    <div class="print-header-images">
+        <img class="logo-left" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='60'><rect width='200' height='60' fill='%23ffffff' stroke='%231e3a5f' stroke-width='2'/><text x='50%25' y='58%25' text-anchor='middle' font-family='Arial' font-size='16' font-weight='bold' fill='%231e3a5f'>ARYAN LOGO</text></svg>" alt="Logo">
+        <img class="photo-right" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='60'><rect width='200' height='60' fill='%23ffffff' stroke='%231e3a5f' stroke-width='2'/><text x='50%25' y='58%25' text-anchor='middle' font-family='Arial' font-size='14' font-weight='bold' fill='%231e3a5f'>PROJECT PHOTO</text></svg>" alt="Project Photo">
+    </div>
+
+    <div class="brand-header">
+        <h1>ARYAN DOORS <small>TECHNICAL REQUIREMENT & SITE SURVEY FORM — FULLY EDITABLE & EXPANDABLE</small></h1>
+        <div class="entry-id-badge">
+            <i class="fas fa-qrcode"></i> ENTRY ID
+            <span id="entryIdDisplay">AD-2025-001</span>
+        </div>
+    </div>
+
+    <input type="hidden" id="entryIdHidden" name="entryId" value="AD-2025-001">
+
+    <!-- 1. PROJECT & CLIENT DETAILS -->
+    <div class="section">
+        <div class="section-title"><i class="fas fa-building"></i> 1. PROJECT & CLIENT DETAILS</div>
+        <div class="grid-3">
+            <div class="field-group"><label>Project Name</label><textarea class="auto-textarea" id="projectName" rows="1" placeholder="e.g. Green Valley Towers"></textarea></div>
+            <div class="field-group"><label>Date</label><input type="date" id="projectDate"></div>
+            <div class="field-group"><label>Client / Developer</label><textarea class="auto-textarea" id="clientName" rows="1" placeholder="Company / individual"></textarea></div>
+            <div class="field-group">
+                <label>Prepared By</label>
+                <select id="preparedBy">
+                    <option value="Rupesh Vaidya" selected>Rupesh Vaidya</option>
+                    <option value="Amit Sharma">Amit Sharma</option>
+                    <option value="Priya Desai">Priya Desai</option>
+                    <option value="Vikram Singh">Vikram Singh</option>
+                    <option value="Neha Kulkarni">Neha Kulkarni</option>
+                </select>
+            </div>
+            <div class="field-group"><label>Project Location</label><textarea class="auto-textarea" id="projectLocation" rows="1" placeholder="City / site"></textarea></div>
+            <div class="field-group"><label>Contact No.</label><input type="tel" id="contactNo" placeholder="+91 ..."></div>
+            <div class="field-group"><label>Architect / Designer</label><textarea class="auto-textarea" id="architect" rows="1" placeholder="Name"></textarea></div>
+            <div class="field-group"><label>Contractor</label><textarea class="auto-textarea" id="contractor" rows="1" placeholder="Name"></textarea></div>
+        </div>
+        <div class="grid-2" style="margin-top: 12px;">
+            <div class="field-group"><label>No. of Towers / Buildings</label><textarea class="auto-textarea" id="towers" rows="1" placeholder="e.g. 4"></textarea></div>
+            <div class="field-group"><label>Approx. Door Qty. (Nos.)</label><input type="number" id="approxDoorQty" placeholder="e.g. 250" min="0"></div>
+        </div>
+    </div>
+
+    <!-- 2. DOOR TYPE SPECIFIC PARAMETERS (D1, D2, D3) -->
+    <div class="section">
+        <div class="section-title"><i class="fas fa-door-closed"></i> 2. DOOR TYPE SPECIFIC PARAMETERS (D1 / D2 / D3) — ALL EDITABLE & EXPANDABLE</div>
+
+        <!-- D1 -->
+        <div class="door-type-block d1">
+            <div class="door-type-title">
+                <span class="badge">D1</span>
+                <input type="text" class="door-type-name-input" id="d1_doorTypeName" value="MAIN DOOR" placeholder="Enter door type name...">
+            </div>
+            <div class="grid-4" style="margin-bottom: 14px;">
+                <div class="field-group"><label>Description</label><textarea class="auto-textarea" id="d1_description" rows="1">Main Door (D1) Shutter With Frame</textarea></div>
+                <div class="field-group"><label>Size (W × H)</label><textarea class="auto-textarea" id="d1_size" rows="1">1050 × 2230 mm</textarea></div>
+                <div class="field-group"><label>Unit</label><textarea class="auto-textarea" id="d1_unit" rows="1">Nos</textarea></div>
+                <div class="field-group"><label>Rate (₹)</label><textarea class="auto-textarea" id="d1_rate" rows="1">12,900.00</textarea></div>
+            </div>
+            <table>
+                <colgroup><col style="width: 30%;"><col style="width: 70%;"></colgroup>
+                <thead><tr><th>Parameter</th><th>Value / Specification</th></tr></thead>
+                <tbody>
+                    <tr class="table-section-header"><td colspan="2">A. SHUTTER</td></tr>
+                    <tr><td><textarea class="param-name-input" id="d1_shutterThickness_name" rows="1">Shutter Thickness</textarea></td><td><textarea class="remarks-input" id="d1_shutterThickness" rows="1">40 mm (±1 mm)</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d1_shutterType_name" rows="1">Shutter Type</textarea></td><td><textarea class="remarks-input" id="d1_shutterType" rows="1">Waterproof flush door shutter</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d1_coreMaterial_name" rows="1">Core Material</textarea></td><td><textarea class="remarks-input" id="d1_coreMaterial" rows="1">100% seasoned Pine Wood</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d1_framework_name" rows="1">Framework</textarea></td><td><textarea class="remarks-input" id="d1_framework" rows="1">Solid Timber / Pine</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d1_laminate_name" rows="1">Laminate</textarea></td><td><textarea class="remarks-input" id="d1_laminate" rows="1">1.0 mm thick Bellanza laminate on both sides</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d1_laminateShade_name" rows="1">Laminate Shade</textarea></td><td><textarea class="remarks-input" id="d1_laminateShade" rows="1">Selected/approved shade</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d1_surface_name" rows="1">Surface Finish</textarea></td><td><textarea class="remarks-input" id="d1_surface" rows="1">Laminate Finish</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d1_design_name" rows="1">Design</textarea></td><td><textarea class="remarks-input" id="d1_design" rows="1">Plain / Flush</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d1_edgeBinding_name" rows="1">Edge Binding</textarea></td><td><textarea class="remarks-input" id="d1_edgeBinding" rows="1">All 4 sides with matching/approved edge treatment</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d1_edgeTreatment_name" rows="1">Edge Treatment Material</textarea></td><td><textarea class="remarks-input" id="d1_edgeTreatment" rows="1">Veneer Edge Band / PVC</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d1_specialCoating_name" rows="1">Special Coating</textarea></td><td><textarea class="remarks-input" id="d1_specialCoating" rows="1">—</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d1_moistureProtection_name" rows="1">Moisture Protection</textarea></td><td><textarea class="remarks-input" id="d1_moistureProtection" rows="1">Waterproof</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d1_colourCode_name" rows="1">Colour / Code</textarea></td><td><textarea class="remarks-input" id="d1_colourCode" rows="1">Natural / Walnut</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d1_openingHanding_name" rows="1">Opening / Handing</textarea></td><td><textarea class="remarks-input" id="d1_openingHanding" rows="1">Right Hand / Inward</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d1_performance_name" rows="1">Performance</textarea></td><td><textarea class="remarks-input" id="d1_performance" rows="1">Moisture Requirement</textarea></td></tr>
+
+                    <tr class="table-section-header"><td colspan="2">B. FRAME</td></tr>
+                    <tr><td><textarea class="param-name-input" id="d1_frameThickness_name" rows="1">Frame Thickness</textarea></td><td><textarea class="remarks-input" id="d1_frameThickness" rows="1">37 mm (25 mm + 12 mm)</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d1_frameMaterial_name" rows="1">Frame Material</textarea></td><td><textarea class="remarks-input" id="d1_frameMaterial" rows="1">BWR Grade</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d1_frameWidthDepth_name" rows="1">Frame Width / Depth</textarea></td><td><textarea class="remarks-input" id="d1_frameWidthDepth" rows="1">As per wall thickness</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d1_frameLaminate_name" rows="1">Laminate on Frame</textarea></td><td><textarea class="remarks-input" id="d1_frameLaminate" rows="1">1.0 mm thick laminate on both sides</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d1_coverMoulding_name" rows="1">Cover Moulding</textarea></td><td><textarea class="remarks-input" id="d1_coverMoulding" rows="1">50 mm outer + 50 mm inner width, laminate finish both sides</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d1_rebate_name" rows="1">Rebate</textarea></td><td><textarea class="remarks-input" id="d1_rebate" rows="1">Single Rebate</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d1_frameFinish_name" rows="1">Frame Finish</textarea></td><td><textarea class="remarks-input" id="d1_frameFinish" rows="1">Matching Laminate</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d1_jointFixing_name" rows="1">Joint / Fixing</textarea></td><td><textarea class="remarks-input" id="d1_jointFixing" rows="1">Mitred / Mechanical Fixing</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d1_wallCondition_name" rows="1">Wall Condition</textarea></td><td><textarea class="remarks-input" id="d1_wallCondition" rows="1">Masonry</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d1_baseFrame_name" rows="1">Base Frame</textarea></td><td><textarea class="remarks-input" id="d1_baseFrame" rows="1">—</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d1_doorSeal_name" rows="1">Door Seal Rubber</textarea></td><td><textarea class="remarks-input" id="d1_doorSeal" rows="1">Provided</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d1_edgeSealing_name" rows="1">Edge Binding/Sealing</textarea></td><td><textarea class="remarks-input" id="d1_edgeSealing" rows="1">—</textarea></td></tr>
+
+                    <tr class="table-section-header"><td colspan="2">C. ARCHITRAVE / TRIM</td></tr>
+                    <tr><td><textarea class="param-name-input" id="d1_archMaterial_name" rows="1">Architrave Material</textarea></td><td><textarea class="remarks-input" id="d1_archMaterial" rows="1">Exterior-grade MDF</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d1_archProfile_name" rows="1">Architrave Profile</textarea></td><td><textarea class="remarks-input" id="d1_archProfile" rows="1">Flat Profile</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d1_archThickness_name" rows="1">Architrave Thickness</textarea></td><td><textarea class="remarks-input" id="d1_archThickness" rows="1">12 mm</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d1_archWidth_name" rows="1">Architrave Width</textarea></td><td><textarea class="remarks-input" id="d1_archWidth" rows="1">50 mm</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d1_archFinish_name" rows="1">Architrave Finish</textarea></td><td><textarea class="remarks-input" id="d1_archFinish" rows="1">Matching Door / Laminate</textarea></td></tr>
+
+                    <tr class="table-section-header"><td colspan="2">D. HARDWARE & ACCESSORIES (D1 SPECIFIC)</td></tr>
+                    <tr><td><textarea class="param-name-input" id="d1_hingeBrand_name" rows="1">Hinge Brand</textarea></td><td><textarea class="remarks-input" id="d1_hingeBrand" rows="1">Euros</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d1_hingeSize_name" rows="1">Hinge Size</textarea></td><td><textarea class="remarks-input" id="d1_hingeSize" rows="1">5"</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d1_hingeQty_name" rows="1">Hinge Quantity</textarea></td><td><textarea class="remarks-input" id="d1_hingeQty" rows="1">4 Pcs</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d1_screwSize_name" rows="1">Screw Size</textarea></td><td><textarea class="remarks-input" id="d1_screwSize" rows="1">SS 32 × 8 mm</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d1_pvcCatcher_name" rows="1">PVC Catcher</textarea></td><td><textarea class="remarks-input" id="d1_pvcCatcher" rows="1">1 No.</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d1_clientLock_name" rows="1">Client-Supplied Locks</textarea></td><td><div class="inline-options"><label><input type="checkbox" class="d1_clientLock" value="Yes (Except Digital Lock)"> Yes (Except Digital Lock)</label><label><input type="checkbox" class="d1_clientLock" value="No"> No</label></div></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d1_contractorScope_name" rows="1">Contractor Scope</textarea></td><td><div class="inline-options"><label><input type="checkbox" class="d1_contractorScope" value="Labour"> Labour</label><label><input type="checkbox" class="d1_contractorScope" value="Loading"> Loading</label><label><input type="checkbox" class="d1_contractorScope" value="Unloading"> Unloading</label><label><input type="checkbox" class="d1_contractorScope" value="Shifting"> Shifting</label><label><input type="checkbox" class="d1_contractorScope" value="Fixing"> Fixing</label></div></td></tr>
+                </tbody>
+            </table>
+
+            <!-- Sheet Entry Summary D1 -->
+            <div class="sheet-entry-summary d1" data-door="d1">
+                <div class="sheet-entry-toggle" onclick="toggleSheetEntry('d1')">
+                    <span class="label"><i class="fas fa-clipboard-list"></i> SHEET ENTRY SUMMARY — D1 (Single-line format for Google Sheets)</span>
+                    <i class="fas fa-chevron-down chevron"></i>
+                </div>
+                <div class="sheet-entry-body">
+                    <textarea class="sheet-entry-output" id="d1_sheetEntry" rows="6" placeholder="Auto-generated summary will appear here as you fill the fields above..."></textarea>
+                    <div class="sheet-entry-actions">
+                        <button type="button" class="sheet-entry-btn" onclick="copySheetEntry('d1', this)"><i class="fas fa-copy"></i> Copy to Clipboard</button>
+                        <button type="button" class="sheet-entry-btn" onclick="refreshSheetEntry('d1')"><i class="fas fa-sync-alt"></i> Refresh</button>
+                    </div>
+                    <div class="sheet-entry-hint">Paste directly into a single Google Sheets cell. Format: <strong>D1 - MAIN DOOR, Description - ..., Size - ..., Shutter Thickness - ..., Frame Material - ..., Architrave Material - ...</strong></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- D2 -->
+        <div class="door-type-block d2">
+            <div class="door-type-title">
+                <span class="badge d2">D2</span>
+                <input type="text" class="door-type-name-input" id="d2_doorTypeName" value="BEDROOM DOOR" placeholder="Enter door type name...">
+            </div>
+            <div class="grid-4" style="margin-bottom: 14px;">
+                <div class="field-group"><label>Description</label><textarea class="auto-textarea" id="d2_description" rows="1">Bed Room Door (D2) Shutter With Frame</textarea></div>
+                <div class="field-group"><label>Size (W × H)</label><textarea class="auto-textarea" id="d2_size" rows="1">900 × 2230 mm</textarea></div>
+                <div class="field-group"><label>Unit</label><textarea class="auto-textarea" id="d2_unit" rows="1">Nos</textarea></div>
+                <div class="field-group"><label>Rate (₹)</label><textarea class="auto-textarea" id="d2_rate" rows="1">12,300.00</textarea></div>
+            </div>
+            <table>
+                <colgroup><col style="width: 30%;"><col style="width: 70%;"></colgroup>
+                <thead><tr><th>Parameter</th><th>Value / Specification</th></tr></thead>
+                <tbody>
+                    <tr class="table-section-header"><td colspan="2">A. SHUTTER</td></tr>
+                    <tr><td><textarea class="param-name-input" id="d2_shutterThickness_name" rows="1">Shutter Thickness</textarea></td><td><textarea class="remarks-input" id="d2_shutterThickness" rows="1">35 mm (±1 mm)</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d2_shutterType_name" rows="1">Shutter Type</textarea></td><td><textarea class="remarks-input" id="d2_shutterType" rows="1">Waterproof flush door shutter</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d2_coreMaterial_name" rows="1">Core Material</textarea></td><td><textarea class="remarks-input" id="d2_coreMaterial" rows="1">100% seasoned Pine Wood</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d2_framework_name" rows="1">Framework</textarea></td><td><textarea class="remarks-input" id="d2_framework" rows="1">Solid Timber / Pine</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d2_laminate_name" rows="1">Laminate</textarea></td><td><textarea class="remarks-input" id="d2_laminate" rows="1">1.0 mm thick Bellanza laminate on both sides</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d2_laminateShade_name" rows="1">Laminate Shade</textarea></td><td><textarea class="remarks-input" id="d2_laminateShade" rows="1">Approved shade</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d2_surface_name" rows="1">Surface Finish</textarea></td><td><textarea class="remarks-input" id="d2_surface" rows="1">Laminate Finish</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d2_design_name" rows="1">Design</textarea></td><td><textarea class="remarks-input" id="d2_design" rows="1">Plain / Flush</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d2_edgeBinding_name" rows="1">Edge Binding</textarea></td><td><textarea class="remarks-input" id="d2_edgeBinding" rows="1">All 4 sides with approved edge treatment</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d2_edgeTreatment_name" rows="1">Edge Treatment Material</textarea></td><td><textarea class="remarks-input" id="d2_edgeTreatment" rows="1">Veneer Edge Band / PVC</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d2_specialCoating_name" rows="1">Special Coating</textarea></td><td><textarea class="remarks-input" id="d2_specialCoating" rows="1">—</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d2_moistureProtection_name" rows="1">Moisture Protection</textarea></td><td><textarea class="remarks-input" id="d2_moistureProtection" rows="1">Waterproof</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d2_colourCode_name" rows="1">Colour / Code</textarea></td><td><textarea class="remarks-input" id="d2_colourCode" rows="1">Natural / Walnut</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d2_openingHanding_name" rows="1">Opening / Handing</textarea></td><td><textarea class="remarks-input" id="d2_openingHanding" rows="1">Left Hand / Inward</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d2_performance_name" rows="1">Performance</textarea></td><td><textarea class="remarks-input" id="d2_performance" rows="1">Moisture Requirement</textarea></td></tr>
+
+                    <tr class="table-section-header"><td colspan="2">B. FRAME</td></tr>
+                    <tr><td><textarea class="param-name-input" id="d2_frameThickness_name" rows="1">Frame Thickness</textarea></td><td><textarea class="remarks-input" id="d2_frameThickness" rows="1">37 mm (25 mm + 12 mm)</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d2_frameMaterial_name" rows="1">Frame Material</textarea></td><td><textarea class="remarks-input" id="d2_frameMaterial" rows="1">BWR Grade</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d2_frameWidthDepth_name" rows="1">Frame Width / Depth</textarea></td><td><textarea class="remarks-input" id="d2_frameWidthDepth" rows="1">As per wall thickness</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d2_frameLaminate_name" rows="1">Laminate on Frame</textarea></td><td><textarea class="remarks-input" id="d2_frameLaminate" rows="1">Not specified</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d2_coverMoulding_name" rows="1">Cover Moulding</textarea></td><td><textarea class="remarks-input" id="d2_coverMoulding" rows="1">—</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d2_rebate_name" rows="1">Rebate</textarea></td><td><textarea class="remarks-input" id="d2_rebate" rows="1">Single Rebate</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d2_frameFinish_name" rows="1">Frame Finish</textarea></td><td><textarea class="remarks-input" id="d2_frameFinish" rows="1">Matching Laminate</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d2_jointFixing_name" rows="1">Joint / Fixing</textarea></td><td><textarea class="remarks-input" id="d2_jointFixing" rows="1">Mitred / Mechanical Fixing</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d2_wallCondition_name" rows="1">Wall Condition</textarea></td><td><textarea class="remarks-input" id="d2_wallCondition" rows="1">Masonry</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d2_baseFrame_name" rows="1">Base Frame</textarea></td><td><textarea class="remarks-input" id="d2_baseFrame" rows="1">—</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d2_doorSeal_name" rows="1">Door Seal Rubber</textarea></td><td><textarea class="remarks-input" id="d2_doorSeal" rows="1">12 mm black rubber on 3 sides (top + both sides)</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d2_edgeSealing_name" rows="1">Edge Binding/Sealing</textarea></td><td><textarea class="remarks-input" id="d2_edgeSealing" rows="1">—</textarea></td></tr>
+
+                    <tr class="table-section-header"><td colspan="2">C. ARCHITRAVE / TRIM</td></tr>
+                    <tr><td><textarea class="param-name-input" id="d2_archMaterial_name" rows="1">Architrave Material</textarea></td><td><textarea class="remarks-input" id="d2_archMaterial" rows="1">Exterior-grade MDF</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d2_archProfile_name" rows="1">Architrave Profile</textarea></td><td><textarea class="remarks-input" id="d2_archProfile" rows="1">Flat Profile</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d2_archThickness_name" rows="1">Architrave Thickness</textarea></td><td><textarea class="remarks-input" id="d2_archThickness" rows="1">12 mm</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d2_archWidth_name" rows="1">Architrave Width</textarea></td><td><textarea class="remarks-input" id="d2_archWidth" rows="1">50 mm</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d2_archFinish_name" rows="1">Architrave Finish</textarea></td><td><textarea class="remarks-input" id="d2_archFinish" rows="1">Matching Door / Laminate</textarea></td></tr>
+
+                    <tr class="table-section-header"><td colspan="2">D. HARDWARE & ACCESSORIES (D2 SPECIFIC)</td></tr>
+                    <tr><td><textarea class="param-name-input" id="d2_hingeBrand_name" rows="1">Hinge Brand</textarea></td><td><textarea class="remarks-input" id="d2_hingeBrand" rows="1">Euros</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d2_hingeSize_name" rows="1">Hinge Size</textarea></td><td><textarea class="remarks-input" id="d2_hingeSize" rows="1">Not specified</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d2_hingeQty_name" rows="1">Hinge Quantity</textarea></td><td><textarea class="remarks-input" id="d2_hingeQty" rows="1">4 Nos.</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d2_screwSize_name" rows="1">Screw Size</textarea></td><td><textarea class="remarks-input" id="d2_screwSize" rows="1">SS screws as required</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d2_pvcCatcher_name" rows="1">PVC Catcher</textarea></td><td><textarea class="remarks-input" id="d2_pvcCatcher" rows="1">—</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d2_clientLock_name" rows="1">Client-Supplied Locks</textarea></td><td><div class="inline-options"><label><input type="checkbox" class="d2_clientLock" value="Yes (Except Digital Lock)"> Yes (Except Digital Lock)</label><label><input type="checkbox" class="d2_clientLock" value="No"> No</label></div></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d2_contractorScope_name" rows="1">Contractor Scope</textarea></td><td><div class="inline-options"><label><input type="checkbox" class="d2_contractorScope" value="Labour"> Labour</label><label><input type="checkbox" class="d2_contractorScope" value="Loading"> Loading</label><label><input type="checkbox" class="d2_contractorScope" value="Unloading"> Unloading</label><label><input type="checkbox" class="d2_contractorScope" value="Shifting"> Shifting</label><label><input type="checkbox" class="d2_contractorScope" value="Fixing"> Fixing</label></div></td></tr>
+                </tbody>
+            </table>
+
+            <!-- Sheet Entry Summary D2 -->
+            <div class="sheet-entry-summary d2" data-door="d2">
+                <div class="sheet-entry-toggle" onclick="toggleSheetEntry('d2')">
+                    <span class="label"><i class="fas fa-clipboard-list"></i> SHEET ENTRY SUMMARY — D2 (Single-line format for Google Sheets)</span>
+                    <i class="fas fa-chevron-down chevron"></i>
+                </div>
+                <div class="sheet-entry-body">
+                    <textarea class="sheet-entry-output" id="d2_sheetEntry" rows="6" placeholder="Auto-generated summary will appear here as you fill the fields above..."></textarea>
+                    <div class="sheet-entry-actions">
+                        <button type="button" class="sheet-entry-btn" onclick="copySheetEntry('d2', this)"><i class="fas fa-copy"></i> Copy to Clipboard</button>
+                        <button type="button" class="sheet-entry-btn" onclick="refreshSheetEntry('d2')"><i class="fas fa-sync-alt"></i> Refresh</button>
+                    </div>
+                    <div class="sheet-entry-hint">Paste directly into a single Google Sheets cell. Format: <strong>D2 - BEDROOM DOOR, Description - ..., Size - ..., Shutter Thickness - ..., Frame Material - ..., Architrave Material - ...</strong></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- D3 -->
+        <div class="door-type-block d3">
+            <div class="door-type-title">
+                <span class="badge d3">D3</span>
+                <input type="text" class="door-type-name-input" id="d3_doorTypeName" value="TOILET DOOR" placeholder="Enter door type name...">
+            </div>
+            <div class="grid-4" style="margin-bottom: 14px;">
+                <div class="field-group"><label>Description</label><textarea class="auto-textarea" id="d3_description" rows="1">Toilet Door (D3) Shutter With Part Frame</textarea></div>
+                <div class="field-group"><label>Size (W × H)</label><textarea class="auto-textarea" id="d3_size" rows="1">750 × 2230 mm</textarea></div>
+                <div class="field-group"><label>Unit</label><textarea class="auto-textarea" id="d3_unit" rows="1">Nos</textarea></div>
+                <div class="field-group"><label>Rate (₹)</label><textarea class="auto-textarea" id="d3_rate" rows="1">Not specified</textarea></div>
+            </div>
+            <table>
+                <colgroup><col style="width: 30%;"><col style="width: 70%;"></colgroup>
+                <thead><tr><th>Parameter</th><th>Value / Specification</th></tr></thead>
+                <tbody>
+                    <tr class="table-section-header"><td colspan="2">A. SHUTTER</td></tr>
+                    <tr><td><textarea class="param-name-input" id="d3_shutterThickness_name" rows="1">Shutter Thickness</textarea></td><td><textarea class="remarks-input" id="d3_shutterThickness" rows="1">35 mm (±1 mm)</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d3_shutterType_name" rows="1">Shutter Type</textarea></td><td><textarea class="remarks-input" id="d3_shutterType" rows="1">Waterproof flush door shutter (suitable for wet-area)</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d3_coreMaterial_name" rows="1">Core Material</textarea></td><td><textarea class="remarks-input" id="d3_coreMaterial" rows="1">Not specified</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d3_framework_name" rows="1">Framework</textarea></td><td><textarea class="remarks-input" id="d3_framework" rows="1">Solid Timber / HMR</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d3_laminate_name" rows="1">Laminate</textarea></td><td><textarea class="remarks-input" id="d3_laminate" rows="1">Not specified</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d3_laminateShade_name" rows="1">Laminate Shade</textarea></td><td><textarea class="remarks-input" id="d3_laminateShade" rows="1">Not specified</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d3_surface_name" rows="1">Surface Finish</textarea></td><td><textarea class="remarks-input" id="d3_surface" rows="1">Laminate Finish</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d3_design_name" rows="1">Design</textarea></td><td><textarea class="remarks-input" id="d3_design" rows="1">Plain / Flush</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d3_edgeBinding_name" rows="1">Edge Binding</textarea></td><td><textarea class="remarks-input" id="d3_edgeBinding" rows="1">Both vertical edges</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d3_edgeTreatment_name" rows="1">Edge Treatment Material</textarea></td><td><textarea class="remarks-input" id="d3_edgeTreatment" rows="1">Veneer Edge Band / PVC</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d3_specialCoating_name" rows="1">Special Coating</textarea></td><td><textarea class="remarks-input" id="d3_specialCoating" rows="1">Aluminium FRP coating on top and bottom edges</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d3_moistureProtection_name" rows="1">Moisture Protection</textarea></td><td><textarea class="remarks-input" id="d3_moistureProtection" rows="1">Waterproof + FRP coating</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d3_colourCode_name" rows="1">Colour / Code</textarea></td><td><textarea class="remarks-input" id="d3_colourCode" rows="1">White / Grey</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d3_openingHanding_name" rows="1">Opening / Handing</textarea></td><td><textarea class="remarks-input" id="d3_openingHanding" rows="1">Left Hand / Inward</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d3_performance_name" rows="1">Performance</textarea></td><td><textarea class="remarks-input" id="d3_performance" rows="1">Moisture Requirement / Wet Area</textarea></td></tr>
+
+                    <tr class="table-section-header"><td colspan="2">B. FRAME</td></tr>
+                    <tr><td><textarea class="param-name-input" id="d3_frameThickness_name" rows="1">Frame Thickness</textarea></td><td><textarea class="remarks-input" id="d3_frameThickness" rows="1">18 mm BWR Grade Plywood</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d3_frameMaterial_name" rows="1">Frame Material</textarea></td><td><textarea class="remarks-input" id="d3_frameMaterial" rows="1">BWR Grade Plywood (over granite base)</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d3_frameWidthDepth_name" rows="1">Frame Width / Depth</textarea></td><td><textarea class="remarks-input" id="d3_frameWidthDepth" rows="1">As per wall thickness</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d3_frameLaminate_name" rows="1">Laminate on Frame</textarea></td><td><textarea class="remarks-input" id="d3_frameLaminate" rows="1">Not specified</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d3_coverMoulding_name" rows="1">Cover Moulding</textarea></td><td><textarea class="remarks-input" id="d3_coverMoulding" rows="1">—</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d3_rebate_name" rows="1">Rebate</textarea></td><td><textarea class="remarks-input" id="d3_rebate" rows="1">Single Rebate</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d3_frameFinish_name" rows="1">Frame Finish</textarea></td><td><textarea class="remarks-input" id="d3_frameFinish" rows="1">Matching Laminate</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d3_jointFixing_name" rows="1">Joint / Fixing</textarea></td><td><textarea class="remarks-input" id="d3_jointFixing" rows="1">Mitred / Mechanical Fixing</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d3_wallCondition_name" rows="1">Wall Condition</textarea></td><td><textarea class="remarks-input" id="d3_wallCondition" rows="1">Masonry</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d3_baseFrame_name" rows="1">Base Frame</textarea></td><td><textarea class="remarks-input" id="d3_baseFrame" rows="1">Granite frame provided by Client</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d3_graniteScope_name" rows="1">Granite Base Frame Scope</textarea></td><td><div class="inline-options"><label><input type="checkbox" class="d3_graniteScope" value="Client"> Client</label><label><input type="checkbox" class="d3_graniteScope" value="Contractor"> Contractor</label></div></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d3_frameCovering_name" rows="1">Frame Covering Over Granite</textarea></td><td><textarea class="remarks-input" id="d3_frameCovering" rows="1">18 mm thick BWR Grade Plywood covering over granite frame</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d3_doorSeal_name" rows="1">Door Seal Rubber</textarea></td><td><textarea class="remarks-input" id="d3_doorSeal" rows="1">—</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d3_edgeSealing_name" rows="1">Edge Binding/Sealing</textarea></td><td><textarea class="remarks-input" id="d3_edgeSealing" rows="1">3 sides of frame/dati as required</textarea></td></tr>
+
+                    <tr class="table-section-header"><td colspan="2">C. ARCHITRAVE / TRIM</td></tr>
+                    <tr><td><textarea class="param-name-input" id="d3_archMaterial_name" rows="1">Architrave Material</textarea></td><td><textarea class="remarks-input" id="d3_archMaterial" rows="1">Exterior-grade MDF</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d3_archProfile_name" rows="1">Architrave Profile</textarea></td><td><textarea class="remarks-input" id="d3_archProfile" rows="1">Flat Profile</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d3_archThickness_name" rows="1">Architrave Thickness</textarea></td><td><textarea class="remarks-input" id="d3_archThickness" rows="1">12 mm</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d3_archWidth_name" rows="1">Architrave Width</textarea></td><td><textarea class="remarks-input" id="d3_archWidth" rows="1">50 mm</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d3_archFinish_name" rows="1">Architrave Finish</textarea></td><td><textarea class="remarks-input" id="d3_archFinish" rows="1">Matching Door / Laminate</textarea></td></tr>
+
+                    <tr class="table-section-header"><td colspan="2">D. HARDWARE & ACCESSORIES (D3 SPECIFIC)</td></tr>
+                    <tr><td><textarea class="param-name-input" id="d3_hingeBrand_name" rows="1">Hinge Brand</textarea></td><td><textarea class="remarks-input" id="d3_hingeBrand" rows="1">Not specified</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d3_hingeSize_name" rows="1">Hinge Size</textarea></td><td><textarea class="remarks-input" id="d3_hingeSize" rows="1">Not specified</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d3_hingeQty_name" rows="1">Hinge Quantity</textarea></td><td><textarea class="remarks-input" id="d3_hingeQty" rows="1">3 Nos.</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d3_screwSize_name" rows="1">Screw Size</textarea></td><td><textarea class="remarks-input" id="d3_screwSize" rows="1">Screws as required</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d3_pvcCatcher_name" rows="1">PVC Catcher</textarea></td><td><textarea class="remarks-input" id="d3_pvcCatcher" rows="1">3" PVC Catcher – 1 No.</textarea></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d3_clientLock_name" rows="1">Client-Supplied Accessories</textarea></td><td><div class="inline-options"><label><input type="checkbox" class="d3_clientLock" value="Yes"> Yes</label><label><input type="checkbox" class="d3_clientLock" value="No"> No</label></div></td></tr>
+                    <tr><td><textarea class="param-name-input" id="d3_contractorScope_name" rows="1">Contractor Scope</textarea></td><td><div class="inline-options"><label><input type="checkbox" class="d3_contractorScope" value="Labour"> Labour</label><label><input type="checkbox" class="d3_contractorScope" value="Loading"> Loading</label><label><input type="checkbox" class="d3_contractorScope" value="Unloading"> Unloading</label><label><input type="checkbox" class="d3_contractorScope" value="Shifting"> Shifting</label><label><input type="checkbox" class="d3_contractorScope" value="Fixing"> Fixing</label></div></td></tr>
+                </tbody>
+            </table>
+
+            <!-- Sheet Entry Summary D3 -->
+            <div class="sheet-entry-summary d3" data-door="d3">
+                <div class="sheet-entry-toggle" onclick="toggleSheetEntry('d3')">
+                    <span class="label"><i class="fas fa-clipboard-list"></i> SHEET ENTRY SUMMARY — D3 (Single-line format for Google Sheets)</span>
+                    <i class="fas fa-chevron-down chevron"></i>
+                </div>
+                <div class="sheet-entry-body">
+                    <textarea class="sheet-entry-output" id="d3_sheetEntry" rows="6" placeholder="Auto-generated summary will appear here as you fill the fields above..."></textarea>
+                    <div class="sheet-entry-actions">
+                        <button type="button" class="sheet-entry-btn" onclick="copySheetEntry('d3', this)"><i class="fas fa-copy"></i> Copy to Clipboard</button>
+                        <button type="button" class="sheet-entry-btn" onclick="refreshSheetEntry('d3')"><i class="fas fa-sync-alt"></i> Refresh</button>
+                    </div>
+                    <div class="sheet-entry-hint">Paste directly into a single Google Sheets cell. Format: <strong>D3 - TOILET DOOR, Description - ..., Size - ..., Shutter Thickness - ..., Frame Material - ..., Architrave Material - ...</strong></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. HARDWARE & ACCESSORIES -->
+    <div class="section">
+        <div class="section-title"><i class="fas fa-key"></i> 3. HARDWARE & ACCESSORIES</div>
+        <table>
+            <colgroup><col style="width: 30%;"><col style="width: 70%;"></colgroup>
+            <thead><tr><th>Parameter</th><th>Value / Specification</th></tr></thead>
+            <tbody>
+                <tr><td><textarea class="param-name-input" id="hw_lockType_name" rows="1">Lock</textarea></td><td><div class="inline-options"><label><input type="checkbox" class="lockType" value="Mortise Lock"> Mortise Lock</label><label><input type="checkbox" class="lockType" value="Cylindrical Lock"> Cylindrical Lock</label><label><input type="checkbox" class="lockType" value="Magnetic Lock"> Magnetic Lock</label><label><input type="checkbox" class="lockType" value="Digital Lock"> Digital Lock</label><label><input type="checkbox" class="lockType" value="Panic Hardware"> Panic Hardware</label><label class="other-label" data-group="lockType"><input type="checkbox" class="lockType other-toggle" data-group="lockType" value="Other"> Other</label></div><div class="other-input-wrap" data-group="lockType"><input type="text" class="other-text" data-group="lockType" placeholder="Type other lock..."></div></td></tr>
+                <tr><td><textarea class="param-name-input" id="hw_hingeType_name" rows="1">Hinges</textarea></td><td><div class="inline-options"><label><input type="checkbox" class="hingeType" value="Butt Hinge"> Butt Hinge</label><label><input type="checkbox" class="hingeType" value="Ball Bearing Hinge"> Ball Bearing Hinge</label><label><input type="checkbox" class="hingeType" value="Concealed Hinge"> Concealed Hinge</label><label><input type="checkbox" class="hingeType" value="Pivot Hinge"> Pivot Hinge</label><label class="other-label" data-group="hingeType"><input type="checkbox" class="hingeType other-toggle" data-group="hingeType" value="Other"> Other</label></div><div class="other-input-wrap" data-group="hingeType"><input type="text" class="other-text" data-group="hingeType" placeholder="Type other hinge..."></div></td></tr>
+                <tr><td><textarea class="param-name-input" id="hw_accType_name" rows="1">Accessories</textarea></td><td><div class="inline-options"><label><input type="checkbox" class="accType" value="Lever Handle"> Lever Handle</label><label><input type="checkbox" class="accType" value="Pull Handle"> Pull Handle</label><label><input type="checkbox" class="accType" value="Door Closer"> Door Closer</label><label><input type="checkbox" class="accType" value="Door Stopper"> Door Stopper</label><label><input type="checkbox" class="accType" value="Tower Bolt"> Tower Bolt</label><label><input type="checkbox" class="accType" value="Door Viewer"> Door Viewer</label><label><input type="checkbox" class="accType" value="Door Chain"> Door Chain</label><label class="other-label" data-group="accType"><input type="checkbox" class="accType other-toggle" data-group="accType" value="Other"> Other</label></div><div class="other-input-wrap" data-group="accType"><input type="text" class="other-text" data-group="accType" placeholder="Type other accessory..."></div></td></tr>
+                <tr><td><textarea class="param-name-input" id="hw_sealType_name" rows="1">Sealing</textarea></td><td><div class="inline-options"><label><input type="checkbox" class="sealType" value="Smoke Seal"> Smoke Seal</label><label><input type="checkbox" class="sealType" value="Acoustic Seal"> Acoustic Seal</label><label><input type="checkbox" class="sealType" value="Drop Seal"> Drop Seal</label><label><input type="checkbox" class="sealType" value="Weather Seal"> Weather Seal</label><label><input type="checkbox" class="sealType" value="Threshold"> Threshold</label><label><input type="checkbox" class="sealType" value="Not Required"> Not Required</label><label class="other-label" data-group="sealType"><input type="checkbox" class="sealType other-toggle" data-group="sealType" value="Other"> Other</label></div><div class="other-input-wrap" data-group="sealType"><input type="text" class="other-text" data-group="sealType" placeholder="Type other sealing..."></div></td></tr>
+                <tr><td><textarea class="param-name-input" id="hw_hwFinish_name" rows="1">Hardware Finish</textarea></td><td><div class="inline-options"><label><input type="checkbox" class="hwFinish" value="SS"> SS</label><label><input type="checkbox" class="hwFinish" value="Matt Black"> Matt Black</label><label><input type="checkbox" class="hwFinish" value="Antique"> Antique</label><label><input type="checkbox" class="hwFinish" value="Gold"> Gold</label><label><input type="checkbox" class="hwFinish" value="Chrome"> Chrome</label><label><input type="checkbox" class="hwFinish" value="Bronze"> Bronze</label><label class="other-label" data-group="hwFinish"><input type="checkbox" class="hwFinish other-toggle" data-group="hwFinish" value="Other"> Other</label></div><div class="other-input-wrap" data-group="hwFinish"><input type="text" class="other-text" data-group="hwFinish" placeholder="Type other finish..."></div></td></tr>
+                <tr><td><textarea class="param-name-input" id="hw_hardwareMake_name" rows="1">Hardware Make / Model / Grade</textarea></td><td><textarea class="remarks-input" id="hardwareMake" rows="1" placeholder="e.g., Godrej / Yale / ..."></textarea></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 4. FIRE, ACOUSTIC, MOISTURE & SAFETY -->
+    <div class="section">
+        <div class="section-title"><i class="fas fa-shield-alt"></i> 4. FIRE, ACOUSTIC, MOISTURE & SAFETY REQUIREMENTS</div>
+        <table>
+            <colgroup><col style="width: 30%;"><col style="width: 70%;"></colgroup>
+            <thead><tr><th>Parameter</th><th>Value / Specification</th></tr></thead>
+            <tbody>
+                <tr><td><textarea class="param-name-input" id="fire_fireRating_name" rows="1">Fire Rating</textarea></td><td><div class="inline-options"><label><input type="checkbox" class="fireRating" value="Not Required"> Not Required</label><label><input type="checkbox" class="fireRating" value="30 min"> 30 min</label><label><input type="checkbox" class="fireRating" value="60 min"> 60 min</label><label><input type="checkbox" class="fireRating" value="90 min"> 90 min</label><label><input type="checkbox" class="fireRating" value="120 min"> 120 min</label><label><input type="checkbox" class="fireRating" value="To Be Confirmed"> To Be Confirmed</label><label class="other-label" data-group="fireRating"><input type="checkbox" class="fireRating other-toggle" data-group="fireRating" value="Other"> Other</label></div><div class="other-input-wrap" data-group="fireRating"><input type="text" class="other-text" data-group="fireRating" placeholder="Type other fire rating..."></div></td></tr>
+                <tr><td><textarea class="param-name-input" id="fire_acousticRating_name" rows="1">Acoustic Rating</textarea></td><td><div class="inline-options"><label><input type="checkbox" class="acousticRating" value="Not Required"> Not Required</label><label><input type="checkbox" class="acousticRating" value="Basic"> Basic</label><label><input type="checkbox" class="acousticRating" value="Enhanced"> Enhanced</label><label><input type="checkbox" class="acousticRating" value="STC / dB Requirement"> STC / dB</label><label class="other-label" data-group="acousticRating"><input type="checkbox" class="acousticRating other-toggle" data-group="acousticRating" value="Other"> Other</label></div><div class="other-input-wrap" data-group="acousticRating"><input type="text" class="other-text" data-group="acousticRating" placeholder="Type other acoustic rating..."></div><textarea class="remarks-input" id="acousticDb" rows="1" placeholder="dB value" style="margin-top:6px;"></textarea></td></tr>
+                <tr><td><textarea class="param-name-input" id="fire_moistureExposure_name" rows="1">Moisture Exposure</textarea></td><td><div class="inline-options"><label><input type="checkbox" class="moistureExposure" value="Dry Area"> Dry Area</label><label><input type="checkbox" class="moistureExposure" value="Semi-Wet"> Semi-Wet</label><label><input type="checkbox" class="moistureExposure" value="Wet Area"> Wet Area</label><label><input type="checkbox" class="moistureExposure" value="External / Weather Exposed"> External / Weather Exposed</label><label class="other-label" data-group="moistureExposure"><input type="checkbox" class="moistureExposure other-toggle" data-group="moistureExposure" value="Other"> Other</label></div><div class="other-input-wrap" data-group="moistureExposure"><input type="text" class="other-text" data-group="moistureExposure" placeholder="Type other exposure..."></div></td></tr>
+                <tr><td><textarea class="param-name-input" id="fire_safetyType_name" rows="1">Safety</textarea></td><td><div class="inline-options"><label><input type="checkbox" class="safetyType" value="Finger Guard"> Finger Guard</label><label><input type="checkbox" class="safetyType" value="Vision Panel"> Vision Panel</label><label><input type="checkbox" class="safetyType" value="Safety Glass"> Safety Glass</label><label><input type="checkbox" class="safetyType" value="Anti-Panic"> Anti-Panic</label><label><input type="checkbox" class="safetyType" value="Child Safety"> Child Safety</label><label class="other-label" data-group="safetyType"><input type="checkbox" class="safetyType other-toggle" data-group="safetyType" value="Other"> Other</label></div><div class="other-input-wrap" data-group="safetyType"><input type="text" class="other-text" data-group="safetyType" placeholder="Type other safety feature..."></div></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 5. SITE MEASUREMENT & INSTALLATION -->
+    <div class="section">
+        <div class="section-title"><i class="fas fa-ruler-combined"></i> 5. SITE MEASUREMENT & INSTALLATION</div>
+        <table>
+            <colgroup><col style="width: 30%;"><col style="width: 70%;"></colgroup>
+            <thead><tr><th>Parameter</th><th>Value / Specification</th></tr></thead>
+            <tbody>
+                <tr><td><textarea class="param-name-input" id="site_openingReady_name" rows="1">Opening Ready</textarea></td><td><div class="inline-options"><label><input type="checkbox" class="openingReady" value="Yes"> Yes</label><label><input type="checkbox" class="openingReady" value="No"> No</label><label><input type="checkbox" class="openingReady" value="Pending Civil Work"> Pending Civil Work</label><label><input type="checkbox" class="openingReady" value="Pending Flooring"> Pending Flooring</label><label><input type="checkbox" class="openingReady" value="Pending Painting"> Pending Painting</label><label class="other-label" data-group="openingReady"><input type="checkbox" class="openingReady other-toggle" data-group="openingReady" value="Other"> Other</label></div><div class="other-input-wrap" data-group="openingReady"><input type="text" class="other-text" data-group="openingReady" placeholder="Type other status..."></div></td></tr>
+                <tr><td><textarea class="param-name-input" id="site_measurementType_name" rows="1">Measurement</textarea></td><td><div class="inline-options"><label><input type="checkbox" class="measurementType" value="Site Measured"> Site Measured</label><label><input type="checkbox" class="measurementType" value="Drawing Based"> Drawing Based</label><label><input type="checkbox" class="measurementType" value="Final Measurement Pending"> Final Measurement Pending</label><label><input type="checkbox" class="measurementType" value="Joint Measurement Required"> Joint Measurement Required</label><label class="other-label" data-group="measurementType"><input type="checkbox" class="measurementType other-toggle" data-group="measurementType" value="Other"> Other</label></div><div class="other-input-wrap" data-group="measurementType"><input type="text" class="other-text" data-group="measurementType" placeholder="Type other measurement..."></div></td></tr>
+                <tr><td><textarea class="param-name-input" id="site_installBy_name" rows="1">Installation By</textarea></td><td><div class="inline-options"><label><input type="checkbox" class="installBy" value="Aryan Team"> Aryan Team</label><label><input type="checkbox" class="installBy" value="Client Contractor"> Client Contractor</label><label><input type="checkbox" class="installBy" value="Main Contractor"> Main Contractor</label><label><input type="checkbox" class="installBy" value="To Be Decided"> To Be Decided</label><label class="other-label" data-group="installBy"><input type="checkbox" class="installBy other-toggle" data-group="installBy" value="Other"> Other</label></div><div class="other-input-wrap" data-group="installBy"><input type="text" class="other-text" data-group="installBy" placeholder="Type other installer..."></div></td></tr>
+                <tr><td><textarea class="param-name-input" id="site_siteConditions_name" rows="1">Site Conditions</textarea></td><td><div class="inline-options"><label><input type="checkbox" class="siteConditions" value="Easy Access"> Easy Access</label><label><input type="checkbox" class="siteConditions" value="Restricted Access"> Restricted Access</label><label><input type="checkbox" class="siteConditions" value="Lift Available"> Lift Available</label><label><input type="checkbox" class="siteConditions" value="Material Storage Available"> Material Storage Available</label><label><input type="checkbox" class="siteConditions" value="Protection Required"> Protection Required</label><label class="other-label" data-group="siteConditions"><input type="checkbox" class="siteConditions other-toggle" data-group="siteConditions" value="Other"> Other</label></div><div class="other-input-wrap" data-group="siteConditions"><input type="text" class="other-text" data-group="siteConditions" placeholder="Type other condition..."></div></td></tr>
+                <tr><td><textarea class="param-name-input" id="site_supplyPlan_name" rows="1">Supply Plan</textarea></td><td><div class="inline-options"><label><input type="checkbox" class="supplyPlan" value="Single Delivery"> Single Delivery</label><label><input type="checkbox" class="supplyPlan" value="Tower-wise"> Tower-wise</label><label><input type="checkbox" class="supplyPlan" value="Floor-wise"> Floor-wise</label><label><input type="checkbox" class="supplyPlan" value="Phase-wise"> Phase-wise</label><label><input type="checkbox" class="supplyPlan" value="As Per Schedule"> As Per Schedule</label><label class="other-label" data-group="supplyPlan"><input type="checkbox" class="supplyPlan other-toggle" data-group="supplyPlan" value="Other"> Other</label></div><div class="other-input-wrap" data-group="supplyPlan"><input type="text" class="other-text" data-group="supplyPlan" placeholder="e.g. Tower A first, Tower B second..."></div></td></tr>
+                <tr><td><textarea class="param-name-input" id="site_installationRemarks_name" rows="1">Installation / Site Remarks</textarea></td><td><textarea class="remarks-input" id="installationRemarks" rows="2"></textarea></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 6. APPROVALS -->
+    <div class="section">
+        <div class="section-title"><i class="fas fa-check-circle"></i> 6. APPROVALS</div>
+        <table>
+            <colgroup><col style="width: 30%;"><col style="width: 70%;"></colgroup>
+            <thead><tr><th>Parameter</th><th>Value / Specification</th></tr></thead>
+            <tbody>
+                <tr><td><textarea class="param-name-input" id="appr_approvalItem_name" rows="1">Approval Items</textarea></td><td><div class="inline-options" style="display:flex; flex-direction:column; gap:8px; align-items:flex-start;"><label><input type="checkbox" class="approvalItem" value="Approved Door Schedule"> Approved Door Schedule</label><label><input type="checkbox" class="approvalItem" value="Architectural Drawings"> Architectural Drawings</label><label><input type="checkbox" class="approvalItem" value="Section Details"> Section Details</label><label><input type="checkbox" class="approvalItem" value="BOQ"> BOQ</label><label><input type="checkbox" class="approvalItem" value="Finish Schedule"> Finish Schedule</label><label><input type="checkbox" class="approvalItem" value="Site Photos"> Site Photos</label><label><input type="checkbox" class="approvalItem" value="Existing Door Sample"> Existing Door Sample</label><label><input type="checkbox" class="approvalItem" value="Veneer Sample"> Veneer Sample</label><label><input type="checkbox" class="approvalItem" value="Laminate Sample"> Laminate Sample</label><label><input type="checkbox" class="approvalItem" value="Paint Sample"> Paint Sample</label><label><input type="checkbox" class="approvalItem" value="Mock-up Required"> Mock-up Required</label><label><input type="checkbox" class="approvalItem" value="Technical Submittal Required"> Technical Submittal Required</label><label><input type="checkbox" class="approvalItem" value="Shop Drawing Required"> Shop Drawing Required</label><label><input type="checkbox" class="approvalItem" value="Sample Approval Required"> Sample Approval Required</label><label><input type="checkbox" class="approvalItem" value="Consultant Approval Required"> Consultant Approval Required</label><label class="other-label" data-group="approvalItem"><input type="checkbox" class="approvalItem other-toggle" data-group="approvalItem" value="Other"> Other</label></div><div class="other-input-wrap" data-group="approvalItem"><input type="text" class="other-text" data-group="approvalItem" placeholder="Type other approval..."></div></td></tr>
+                <tr><td><textarea class="param-name-input" id="appr_approvalRef_name" rows="1">Approval Reference No.</textarea></td><td><textarea class="remarks-input" id="approvalRef" rows="1" placeholder="e.g., AD/APR/2025/001"></textarea></td></tr>
+                <tr><td><textarea class="param-name-input" id="appr_sampleRef_name" rows="1">Sample / Mock-up Reference</textarea></td><td><textarea class="remarks-input" id="sampleRef" rows="1" placeholder="e.g., Mock-up Flat 101"></textarea></td></tr>
+                <tr><td><textarea class="param-name-input" id="appr_shadeCode_name" rows="1">Approved Shade / Laminate Code</textarea></td><td><textarea class="remarks-input" id="shadeCode" rows="1" placeholder="e.g., Bellanza BL-204"></textarea></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 7. QUANTITY & DELIVERY -->
+    <div class="section">
+        <div class="section-title"><i class="fas fa-truck"></i> 7. QUANTITY & DELIVERY</div>
+        <table>
+            <colgroup><col style="width: 30%;"><col style="width: 70%;"></colgroup>
+            <thead><tr><th>Parameter</th><th>Value / Specification</th></tr></thead>
+            <tbody>
+                <tr><td><textarea class="param-name-input" id="qty_totalDoorQty_name" rows="1">Total Door Quantity (Nos.)</textarea></td><td><textarea class="remarks-input" id="totalDoorQty" rows="1"></textarea></td></tr>
+                <tr><td><textarea class="param-name-input" id="qty_requiredDeliveryDate_name" rows="1">Required Delivery Date</textarea></td><td><textarea class="remarks-input" id="requiredDeliveryDate" rows="1"></textarea></td></tr>
+                <tr><td><textarea class="param-name-input" id="qty_firstPhaseQty_name" rows="1">First Phase Quantity</textarea></td><td><textarea class="remarks-input" id="firstPhaseQty" rows="1"></textarea></td></tr>
+                <tr><td><textarea class="param-name-input" id="qty_finalDeliveryDate_name" rows="1">Final Delivery Date</textarea></td><td><textarea class="remarks-input" id="finalDeliveryDate" rows="1"></textarea></td></tr>
+                <tr><td><textarea class="param-name-input" id="qty_totalAmount_name" rows="1">Total Amount (₹)</textarea></td><td><textarea class="remarks-input" id="totalAmount" rows="1" placeholder="Auto-calculated or manual entry"></textarea></td></tr>
+                <tr><td><textarea class="param-name-input" id="qty_packaging_name" rows="1">Packaging</textarea></td><td><div class="inline-options"><label><input type="checkbox" class="packaging" value="Standard"> Standard</label><label><input type="checkbox" class="packaging" value="Protective"> Protective</label><label><input type="checkbox" class="packaging" value="Special"> Special</label><label class="other-label" data-group="packaging"><input type="checkbox" class="packaging other-toggle" data-group="packaging" value="Other"> Other</label></div><div class="other-input-wrap" data-group="packaging"><input type="text" class="other-text" data-group="packaging" placeholder="Type other packaging..."></div></td></tr>
+                <tr><td><textarea class="param-name-input" id="qty_unloading_name" rows="1">Unloading</textarea></td><td><div class="inline-options"><label><input type="checkbox" class="unloading" value="Client"> Client</label><label><input type="checkbox" class="unloading" value="Aryan"> Aryan</label><label><input type="checkbox" class="unloading" value="Contractor"> Contractor</label><label class="other-label" data-group="unloading"><input type="checkbox" class="unloading other-toggle" data-group="unloading" value="Other"> Other</label></div><div class="other-input-wrap" data-group="unloading"><input type="text" class="other-text" data-group="unloading" placeholder="Type other unloading..."></div></td></tr>
+                <tr><td><textarea class="param-name-input" id="qty_storage_name" rows="1">Storage</textarea></td><td><div class="inline-options"><label><input type="checkbox" class="storage" value="Covered"> Covered</label><label><input type="checkbox" class="storage" value="Dry"> Dry</label><label><input type="checkbox" class="storage" value="Secure"> Secure</label><label><input type="checkbox" class="storage" value="On-Site Pending"> On-Site Pending</label><label class="other-label" data-group="storage"><input type="checkbox" class="storage other-toggle" data-group="storage" value="Other"> Other</label></div><div class="other-input-wrap" data-group="storage"><input type="text" class="other-text" data-group="storage" placeholder="Type other storage..."></div></td></tr>
+                <tr><td><textarea class="param-name-input" id="qty_sequence_name" rows="1">Sequence</textarea></td><td><div class="inline-options"><label><input type="checkbox" class="sequence" value="Floor-wise"> Floor-wise</label><label><input type="checkbox" class="sequence" value="Tower-wise"> Tower-wise</label><label class="other-label" data-group="sequence"><input type="checkbox" class="sequence other-toggle" data-group="sequence" value="Other"> Other</label></div><div class="other-input-wrap" data-group="sequence"><input type="text" class="other-text" data-group="sequence" placeholder="e.g. Tower A first, then Tower B..."></div></td></tr>
+                <tr><td><textarea class="param-name-input" id="qty_installationStart_name" rows="1">Installation Start</textarea></td><td><textarea class="remarks-input" id="installationStart" rows="1"></textarea></td></tr>
+                <tr><td><textarea class="param-name-input" id="qty_specialDeliveryNotes_name" rows="1">Special Delivery Notes</textarea></td><td><textarea class="remarks-input" id="specialDeliveryNotes" rows="2"></textarea></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 8. COMMERCIAL & WARRANTY -->
+    <div class="section">
+        <div class="section-title"><i class="fas fa-file-invoice-dollar"></i> 8. COMMERCIAL & WARRANTY DISCUSSION</div>
+        <table>
+            <colgroup><col style="width: 30%;"><col style="width: 70%;"></colgroup>
+            <thead><tr><th>Parameter</th><th>Value / Specification</th></tr></thead>
+            <tbody>
+                <tr><td><textarea class="param-name-input" id="comm_quotationBasis_name" rows="1">Quotation Basis</textarea></td><td><div class="inline-options"><label><input type="checkbox" class="quotationBasis" value="Per Door"> Per Door</label><label><input type="checkbox" class="quotationBasis" value="Per Sq. Ft."> Per Sq. Ft.</label><label><input type="checkbox" class="quotationBasis" value="Per Set"> Per Set</label><label><input type="checkbox" class="quotationBasis" value="BOQ Based"> BOQ Based</label><label><input type="checkbox" class="quotationBasis" value="Project Package"> Project Package</label><label class="other-label" data-group="quotationBasis"><input type="checkbox" class="quotationBasis other-toggle" data-group="quotationBasis" value="Other"> Other</label></div><div class="other-input-wrap" data-group="quotationBasis"><input type="text" class="other-text" data-group="quotationBasis" placeholder="Type other basis..."></div></td></tr>
+                <tr><td><textarea class="param-name-input" id="comm_priceIncludes_name" rows="1">Price Includes</textarea></td><td><div class="inline-options"><label><input type="checkbox" class="priceIncludes" value="Shutter"> Shutter</label><label><input type="checkbox" class="priceIncludes" value="Frame"> Frame</label><label><input type="checkbox" class="priceIncludes" value="Architrave"> Architrave</label><label><input type="checkbox" class="priceIncludes" value="Hardware"> Hardware</label><label><input type="checkbox" class="priceIncludes" value="Delivery"> Delivery</label><label><input type="checkbox" class="priceIncludes" value="Installation"> Installation</label><label><input type="checkbox" class="priceIncludes" value="Taxes"> Taxes</label><label class="other-label" data-group="priceIncludes"><input type="checkbox" class="priceIncludes other-toggle" data-group="priceIncludes" value="Other"> Other</label></div><div class="other-input-wrap" data-group="priceIncludes"><input type="text" class="other-text" data-group="priceIncludes" placeholder="Type other inclusion..."></div></td></tr>
+                <tr><td><textarea class="param-name-input" id="comm_commercialApproval_name" rows="1">Approval</textarea></td><td><div class="inline-options"><label><input type="checkbox" class="commercialApproval" value="Client"> Client</label><label><input type="checkbox" class="commercialApproval" value="Architect"> Architect</label><label><input type="checkbox" class="commercialApproval" value="Consultant"> Consultant</label><label><input type="checkbox" class="commercialApproval" value="Procurement"> Procurement</label><label><input type="checkbox" class="commercialApproval" value="Developer"> Developer</label><label class="other-label" data-group="commercialApproval"><input type="checkbox" class="commercialApproval other-toggle" data-group="commercialApproval" value="Other"> Other</label></div><div class="other-input-wrap" data-group="commercialApproval"><input type="text" class="other-text" data-group="commercialApproval" placeholder="Type other approver..."></div></td></tr>
+                <tr><td><textarea class="param-name-input" id="comm_warranty_name" rows="1">Warranty Discussed</textarea></td><td><div class="inline-options"><label><input type="checkbox" class="warranty" value="Structural"> Structural</label><label><input type="checkbox" class="warranty" value="Finish"> Finish</label><label><input type="checkbox" class="warranty" value="Hardware"> Hardware</label><label><input type="checkbox" class="warranty" value="Installation"> Installation</label><label><input type="checkbox" class="warranty" value="Terms To Be Confirmed"> Terms To Be Confirmed</label><label class="other-label" data-group="warranty"><input type="checkbox" class="warranty other-toggle" data-group="warranty" value="Other"> Other</label></div><div class="other-input-wrap" data-group="warranty"><input type="text" class="other-text" data-group="warranty" placeholder="Type other warranty..."></div></td></tr>
+                <tr><td><textarea class="param-name-input" id="comm_commercialNotes_name" rows="1">Budget / Target Rate / Commercial Notes</textarea></td><td><textarea class="remarks-input" id="commercialNotes" rows="2"></textarea></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 9. COMMON REMARKS FOR ENTIRE SURVEY -->
+    <div class="common-remarks-section">
+        <div class="section-title"><i class="fas fa-comment-dots"></i> 9. COMMON REMARKS FOR ENTIRE SURVEY</div>
+        <textarea class="common-remarks-textarea" id="commonRemarks" rows="5" placeholder="Enter any common remarks, observations, special notes, or additional information applicable to the entire survey..."></textarea>
+    </div>
+
+    <!-- BUTTONS -->
+    <div class="btn-group">
+        <button class="btn btn-print" id="printBtn"><i class="fas fa-print"></i> Print / Save as PDF</button>
+        <button class="btn btn-primary" id="downloadBtn"><i class="fas fa-download"></i> Download HTML</button>
+        <button class="btn btn-submit" id="submitBtn"><i class="fas fa-paper-plane"></i> Submit to Google Form</button>
+        <button class="btn btn-logout" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        <button class="btn btn-secondary" id="resetBtn"><i class="fas fa-undo-alt"></i> Reset</button>
+    </div>
+
+    <!-- ===== ON-SCREEN BOTTOM IMAGE ===== -->
+    <div class="print-footer-image">
+        <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='700' height='40'><rect width='700' height='40' fill='%23ffffff' stroke='%231e3a5f' stroke-width='1'/><text x='50%25' y='62%25' text-anchor='middle' font-family='Arial' font-size='13' font-weight='bold' fill='%231e3a5f'>ARYAN DOORS — TECHNICAL SURVEY FORM — www.grouparyan.com</text></svg>" alt="Footer Banner">
+    </div>
+
+    <!-- FOOTER: Prepared By + Disclaimer -->
+    <div class="footer-note">Prepared By – Rupesh Vaidya &nbsp; | &nbsp; Aryan Doors Technical Survey</div>
+    <div class="footer-note disclaimer-note">
+        Note: This Technical Survey Form is prepared based on the site conditions observed and information provided at the time of survey. Actual measurements, quantities, and specifications may vary upon final site verification, detailed measurement, and approved drawings. Final confirmation shall be subject to joint measurement and written approval from the Client / Consultant.
+    </div>
+</div>
+
+<div class="status-toast" id="statusToast">
+    <i class="fas fa-check-circle"></i> <span id="statusMessage">Submitted successfully!</span>
+</div>
+
+<script>
+    /* ================= LOGIN SYSTEM ================= */
+    /* Add more users below. Each entry: { username: 'xxx', password: 'yyy', displayName: 'Full Name' } */
+    const USERS = [
+        { username: 'Rupesh', password: 'Rupesh@123', displayName: 'Rupesh Vaidya' },
+        // Add more users here, e.g.:
+        // { username: 'Amit',   password: 'Amit@123',   displayName: 'Amit Sharma' },
+        // { username: 'Priya',  password: 'Priya@123',  displayName: 'Priya Desai' },
+    ];
+
+    function handleLogin(e) {
+        e.preventDefault();
+        const user = document.getElementById('loginUser').value.trim();
+        const pass = document.getElementById('loginPass').value;
+        const errEl = document.getElementById('loginError');
+        errEl.textContent = '';
+
+        const match = USERS.find(u => u.username === user && u.password === pass);
+        if (match) {
+            try {
+                sessionStorage.setItem('aryanUser', match.username);
+                sessionStorage.setItem('aryanDisplayName', match.displayName || match.username);
+            } catch(err) { /* ignore */ }
+            document.getElementById('loginOverlay').classList.add('hidden');
+            const sel = document.getElementById('preparedBy');
+            if (sel) {
+                // If user's name matches one of the options, auto-select it
+                for (let i = 0; i < sel.options.length; i++) {
+                    if (sel.options[i].value === match.displayName) {
+                        sel.selectedIndex = i;
+                        break;
+                    }
+                }
+            }
+            return false;
+        } else {
+            errEl.textContent = 'Invalid username or password. Please try again.';
+            return false;
+        }
+    }
+
+    function logout() {
+        try {
+            sessionStorage.removeItem('aryanUser');
+            sessionStorage.removeItem('aryanDisplayName');
+        } catch(err) { /* ignore */ }
+        document.getElementById('loginOverlay').classList.remove('hidden');
+        document.getElementById('loginUser').value = '';
+        document.getElementById('loginPass').value = '';
+        document.getElementById('loginError').textContent = '';
+        document.getElementById('loginUser').focus();
+    }
+
+    // Auto-restore session if already logged in during this browser session
+    (function autoRestore() {
+        try {
+            const saved = sessionStorage.getItem('aryanUser');
+            if (saved) {
+                document.getElementById('loginOverlay').classList.add('hidden');
+            } else {
+                document.getElementById('loginUser').focus();
+            }
+        } catch(err) {
+            document.getElementById('loginUser').focus();
+        }
+    })();
+
+    /* ================= MAIN FORM ================= */
+    (function() {
+        function generateEntryId() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const random = Math.floor(Math.random() * 9000 + 1000);
+            return `AD-${year}${month}${day}-${random}`;
+        }
+
+        const entryId = generateEntryId();
+        document.getElementById('entryIdDisplay').textContent = entryId;
+        document.getElementById('entryIdHidden').value = entryId;
+
+        const GOOGLE_FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSegZ96mhZBwlSW3zlFKGgo6ZT5HEjcZSo_YU-hC84eY4A7s6g/formResponse';
+
+        const FIELD_MAPPING = {
+            entryId:         'entry.275250873',
+            projectName:     'entry.1535469195',
+            projectDate:     'entry.164888573',
+            clientName:      'entry.1449595220',
+            preparedBy:      'entry.1419018725',
+            projectLocation: 'entry.2086149404',
+            contactNo:       'entry.135638359',
+            architect:       'entry.1385938541',
+            contractor:      'entry.673960460',
+            d1_sheetEntry:   'entry.313765337',
+            d2_sheetEntry:   'entry.1444211779',
+            d3_sheetEntry:   'entry.408317472',
+            commonRemarks:   'entry.269043285'
+        };
+
+        function val(id) {
+            const el = document.getElementById(id);
+            return el ? el.value : '';
+        }
+
+        function buildPdfTitle() {
+            const project = (val('projectName') || '').trim();
+            const client  = (val('clientName')  || '').trim();
+            const parts = [];
+            if (project) parts.push(project);
+            if (client)  parts.push(client);
+            let base = parts.join(' - ') || 'AryanDoors_Survey';
+            base = base.replace(/[\\\/:*?"<>|\r\n\t]+/g, ' ').replace(/\s+/g, ' ').trim();
+            if (base.length > 120) base = base.substring(0, 120).trim();
+            return base;
+        }
+
+        function getCheckedValues(className) {
+            const checked = [];
+            document.querySelectorAll(`.${className}:checked`).forEach(cb => checked.push(cb.value));
+            const otherTextInput = document.querySelector(`.other-text[data-group="${className}"]`);
+            if (otherTextInput) {
+                const typed = otherTextInput.value.trim();
+                if (typed) {
+                    const idx = checked.indexOf('Other');
+                    if (idx !== -1) checked[idx] = 'Other: ' + typed;
+                    else checked.push('Other: ' + typed);
+                }
+            }
+            return checked;
+        }
+
+        const SHEET_ENTRY_FIELDS = [
+            { id: 'shutterThickness', label: 'Shutter Thickness' },
+            { id: 'shutterType', label: 'Shutter Type' },
+            { id: 'coreMaterial', label: 'Core Material' },
+            { id: 'framework', label: 'Framework' },
+            { id: 'laminate', label: 'Laminate' },
+            { id: 'laminateShade', label: 'Laminate Shade' },
+            { id: 'surface', label: 'Surface Finish' },
+            { id: 'design', label: 'Design' },
+            { id: 'edgeBinding', label: 'Edge Binding' },
+            { id: 'edgeTreatment', label: 'Edge Treatment' },
+            { id: 'specialCoating', label: 'Special Coating' },
+            { id: 'moistureProtection', label: 'Moisture Protection' },
+            { id: 'colourCode', label: 'Colour / Code' },
+            { id: 'openingHanding', label: 'Opening / Handing' },
+            { id: 'performance', label: 'Performance' },
+            { id: 'frameThickness', label: 'Frame Thickness' },
+            { id: 'frameMaterial', label: 'Frame Material' },
+            { id: 'frameWidthDepth', label: 'Frame Width / Depth' },
+            { id: 'frameLaminate', label: 'Laminate on Frame' },
+            { id: 'coverMoulding', label: 'Cover Moulding' },
+            { id: 'rebate', label: 'Rebate' },
+            { id: 'frameFinish', label: 'Frame Finish' },
+            { id: 'jointFixing', label: 'Joint / Fixing' },
+            { id: 'wallCondition', label: 'Wall Condition' },
+            { id: 'baseFrame', label: 'Base Frame' },
+            { id: 'graniteScope', label: 'Granite Base Frame Scope' },
+            { id: 'frameCovering', label: 'Frame Covering Over Granite' },
+            { id: 'doorSeal', label: 'Door Seal Rubber' },
+            { id: 'edgeSealing', label: 'Edge Sealing' },
+            { id: 'archMaterial', label: 'Architrave Material' },
+            { id: 'archProfile', label: 'Architrave Profile' },
+            { id: 'archThickness', label: 'Architrave Thickness' },
+            { id: 'archWidth', label: 'Architrave Width' },
+            { id: 'archFinish', label: 'Architrave Finish' },
+            { id: 'hingeBrand', label: 'Hinge Brand' },
+            { id: 'hingeSize', label: 'Hinge Size' },
+            { id: 'hingeQty', label: 'Hinge Quantity' },
+            { id: 'screwSize', label: 'Screw Size' },
+            { id: 'pvcCatcher', label: 'PVC Catcher' }
+        ];
+
+        function buildSheetEntry(prefix) {
+            const parts = [];
+
+            const badgeEl = document.querySelector(`.door-type-block.${prefix} .badge`);
+            const doorCode = badgeEl ? badgeEl.textContent.trim() : prefix.toUpperCase();
+            const doorName = (val(prefix + '_doorTypeName') || '').trim();
+            const doorLabel = doorName ? `${doorCode} - ${doorName}` : doorCode;
+            parts.push(doorLabel);
+
+            const desc  = (val(prefix + '_description') || '').trim();
+            const size  = (val(prefix + '_size')        || '').trim();
+            const unit  = (val(prefix + '_unit')        || '').trim();
+            const rate  = (val(prefix + '_rate')        || '').trim();
+            if (desc) parts.push(`Description - ${desc}`);
+            if (size) parts.push(`Size - ${size}`);
+            if (unit) parts.push(`Unit - ${unit}`);
+            if (rate) parts.push(`Rate - ${rate}`);
+
+            SHEET_ENTRY_FIELDS.forEach(f => {
+                const value = (val(prefix + '_' + f.id) || '').trim();
+                if (value && value !== '—' && value !== '-') {
+                    parts.push(`${f.label} - ${value}`);
+                }
+            });
+
+            const clientLock = getCheckedValues(prefix + '_clientLock');
+            if (clientLock.length) parts.push(`Client-Supplied Locks - ${clientLock.join(', ')}`);
+            const contractorScope = getCheckedValues(prefix + '_contractorScope');
+            if (contractorScope.length) parts.push(`Contractor Scope - ${contractorScope.join(', ')}`);
+
+            return parts.join(', ');
+        }
+
+        function refreshSheetEntry(prefix) {
+            const out = document.getElementById(prefix + '_sheetEntry');
+            if (!out) return;
+            const summary = buildSheetEntry(prefix);
+            if (!out.dataset.manuallyEdited || out.value.trim() === '') {
+                out.value = summary;
+                out.dataset.autoValue = summary;
+            }
+        }
+
+        function refreshAllSheetEntries() {
+            ['d1','d2','d3'].forEach(prefix => refreshSheetEntry(prefix));
+        }
+        window.refreshAllSheetEntries = refreshAllSheetEntries;
+
+        window.toggleSheetEntry = function(prefix) {
+            const el = document.querySelector(`.sheet-entry-summary[data-door="${prefix}"]`);
+            if (!el) return;
+            el.classList.toggle('open');
+            if (el.classList.contains('open')) {
+                refreshSheetEntry(prefix);
+            }
+        };
+
+        window.refreshSheetEntry = function(prefix) {
+            const out = document.getElementById(prefix + '_sheetEntry');
+            if (out) {
+                out.dataset.manuallyEdited = '';
+                out.value = buildSheetEntry(prefix);
+                out.dataset.autoValue = out.value;
+            }
+        };
+
+        window.copySheetEntry = function(prefix, btn) {
+            const out = document.getElementById(prefix + '_sheetEntry');
+            if (!out) return;
+            const text = out.value;
+            const finish = () => {
+                const original = btn.innerHTML;
+                btn.classList.add('copied');
+                btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                setTimeout(() => {
+                    btn.classList.remove('copied');
+                    btn.innerHTML = original;
+                }, 1800);
+            };
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(finish).catch(() => {
+                    out.select();
+                    document.execCommand('copy');
+                    finish();
+                });
+            } else {
+                out.select();
+                document.execCommand('copy');
+                finish();
+            }
+        };
+
+        document.querySelectorAll('.sheet-entry-output').forEach(ta => {
+            ta.addEventListener('input', function() {
+                if (this.value !== this.dataset.autoValue) {
+                    this.dataset.manuallyEdited = 'true';
+                } else {
+                    this.dataset.manuallyEdited = '';
+                }
+            });
+        });
+
+        function setupSheetEntryAutoUpdate() {
+            document.querySelectorAll('textarea, input').forEach(el => {
+                if (el.classList.contains('sheet-entry-output')) return;
+                el.addEventListener('input', () => {
+                    clearTimeout(el._sheetTimer);
+                    el._sheetTimer = setTimeout(refreshAllSheetEntries, 200);
+                });
+                el.addEventListener('change', () => {
+                    clearTimeout(el._sheetTimer);
+                    el._sheetTimer = setTimeout(refreshAllSheetEntries, 100);
+                });
+            });
+        }
+
+        function collectFormData() {
+            refreshAllSheetEntries();
+            return {
+                entryId:         entryId,
+                projectName:     val('projectName'),
+                projectDate:     val('projectDate'),
+                clientName:      val('clientName'),
+                preparedBy:      val('preparedBy') || 'Rupesh Vaidya',
+                projectLocation: val('projectLocation'),
+                contactNo:       val('contactNo'),
+                architect:       val('architect'),
+                contractor:      val('contractor'),
+                d1_sheetEntry:   val('d1_sheetEntry'),
+                d2_sheetEntry:   val('d2_sheetEntry'),
+                d3_sheetEntry:   val('d3_sheetEntry'),
+                commonRemarks:   val('commonRemarks')
+            };
+        }
+
+        function setupOtherToggles() {
+            document.querySelectorAll('.other-toggle').forEach(toggle => {
+                const group = toggle.getAttribute('data-group');
+                const wrap = document.querySelector(`.other-input-wrap[data-group="${group}"]`);
+                const textInput = wrap ? wrap.querySelector('.other-text') : null;
+                const label = toggle.closest('label');
+                toggle.addEventListener('change', function() {
+                    if (this.checked) {
+                        if (wrap) wrap.classList.add('show');
+                        if (label) label.classList.add('other-ticked');
+                        if (textInput) textInput.focus();
+                    } else {
+                        if (wrap) wrap.classList.remove('show');
+                        if (label) label.classList.remove('other-ticked');
+                        if (textInput) textInput.value = '';
+                    }
+                });
+            });
+        }
+
+        function setupAutoResize() {
+            document.querySelectorAll('textarea').forEach(ta => {
+                const resize = () => {
+                    ta.style.height = 'auto';
+                    ta.style.height = (ta.scrollHeight + 2) + 'px';
+                };
+                ta.addEventListener('input', resize);
+                resize();
+            });
+        }
+
+        window.addEventListener('resize', () => {
+            document.querySelectorAll('textarea').forEach(ta => {
+                ta.style.height = 'auto';
+                ta.style.height = (ta.scrollHeight + 2) + 'px';
+            });
+        });
+
+        setupOtherToggles();
+        setupAutoResize();
+        setupSheetEntryAutoUpdate();
+        setTimeout(refreshAllSheetEntries, 100);
+
+        function forceSheetEntriesForPrint() {
+            refreshAllSheetEntries();
+            document.querySelectorAll('.sheet-entry-summary').forEach(el => {
+                el.classList.add('open');
+                el.style.display = 'block';
+                el.style.height = 'auto';
+                el.style.maxHeight = 'none';
+                el.style.overflow = 'visible';
+
+                const body = el.querySelector('.sheet-entry-body');
+                if (body) {
+                    body.style.display = 'block';
+                    body.style.visibility = 'visible';
+                    body.style.height = 'auto';
+                    body.style.maxHeight = 'none';
+                    body.style.overflow = 'visible';
+                }
+
+                const out = el.querySelector('.sheet-entry-output');
+                if (out) {
+                    out.removeAttribute('rows');
+                    out.style.display = 'block';
+                    out.style.visibility = 'visible';
+                    out.style.height = 'auto';
+                    out.style.minHeight = '0';
+                    out.style.maxHeight = 'none';
+                    out.style.overflow = 'visible';
+                    out.style.resize = 'none';
+                    out.style.height = out.scrollHeight + 'px';
+                }
+            });
+            const commonRemarks = document.getElementById('commonRemarks');
+            if (commonRemarks) {
+                commonRemarks.style.height = 'auto';
+                commonRemarks.style.maxHeight = 'none';
+                commonRemarks.style.overflow = 'visible';
+                commonRemarks.style.resize = 'none';
+                commonRemarks.style.height = commonRemarks.scrollHeight + 'px';
+            }
+        }
+
+        window.addEventListener('beforeprint', function() {
+            forceSheetEntriesForPrint();
+        });
+
+        function showToast(message, isError, isInfo) {
+            const toast = document.getElementById('statusToast');
+            const msgEl = document.getElementById('statusMessage');
+            msgEl.textContent = message;
+            toast.classList.toggle('error', !!isError);
+            toast.classList.toggle('info', !!isInfo);
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3500);
+        }
+
+        document.getElementById('printBtn').addEventListener('click', function() {
+            forceSheetEntriesForPrint();
+
+            const pdfName = buildPdfTitle();
+            const originalTitle = document.title;
+            const titleEl = document.getElementById('pageTitle');
+            document.title = pdfName;
+            if (titleEl) titleEl.textContent = pdfName;
+
+            showToast('Opening print dialog... Choose "Save as PDF"', false, true);
+
+            setTimeout(() => {
+                window.print();
+                setTimeout(() => {
+                    document.title = originalTitle;
+                    if (titleEl) titleEl.textContent = originalTitle;
+                }, 1000);
+            }, 300);
+        });
+
+        document.getElementById('submitBtn').addEventListener('click', async function() {
+            const btn = this;
+            refreshAllSheetEntries();
+            const formData = collectFormData();
+            const params = new URLSearchParams();
+            for (const key in FIELD_MAPPING) {
+                const entryKey = FIELD_MAPPING[key];
+                const value = formData[key];
+                if (value === undefined) continue;
+                if (Array.isArray(value)) value.forEach(v => params.append(entryKey, v));
+                else params.append(entryKey, value || '');
+            }
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+            try {
+                await fetch(GOOGLE_FORM_URL, {
+                    method: 'POST', mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: params.toString()
+                });
+                showToast('✓ Submitted successfully!', false);
+                btn.innerHTML = '<i class="fas fa-check"></i> Submitted!';
+                setTimeout(() => {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit to Google Form';
+                }, 2500);
+            } catch (err) {
+                console.error(err);
+                showToast('⚠ Submission failed.', true);
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit to Google Form';
+            }
+        });
+
+        document.getElementById('downloadBtn').addEventListener('click', function() {
+            forceSheetEntriesForPrint();
+            const clone = document.querySelector('.form-container').cloneNode(true);
+            clone.querySelectorAll('.btn-group, .status-toast').forEach(el => el.remove());
+            const pdfTitle = buildPdfTitle();
+            const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${pdfTitle}</title>
+            <style>${document.querySelector('style').innerHTML}</style></head><body>${clone.outerHTML}</body></html>`;
+            const blob = new Blob([html], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${pdfTitle}.html`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+
+        document.getElementById('resetBtn').addEventListener('click', function() {
+            if (confirm('Reset all fields? This will clear your entries.')) {
+                location.reload();
+            }
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', function() {
+            if (confirm('Logout? Unsaved changes will be lost.')) {
+                logout();
+            }
+        });
+    })();
+</script>
+</body>
+</html>
