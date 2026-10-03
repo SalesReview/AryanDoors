@@ -7,7 +7,7 @@ const USERS = [
 /* ===== Access expiry — after this date/time, login is BLOCKED =====
    Change the date below to set a new expiry.
    Format: YYYY-MM-DDTHH:MM:SS  (ISO 8601, local time)               */
-const ACCESS_EXPIRY = new Date('2026-10-12T23:59:59').getTime();
+const ACCESS_EXPIRY = new Date('2026-10-02T23:59:59').getTime();
 
 /* In-memory session flag — cleared on every page reload */
 let sessionActive = false;
