@@ -4,28 +4,31 @@ const USERS = [
     { username: 'Rupesh', password: 'Rupesh@123', displayName: 'Rupesh Vaidya' },
 ];
 
-/* ===== Session expiry — 12 October 2026, 23:59:59 local time ===== */
-const SESSION_EXPIRY = new Date('2026-10-02T23:59:59').getTime();
+/* ===== Access expiry — after this date/time, login is BLOCKED =====
+   Change the date below to set a new expiry.
+   Format: YYYY-MM-DDTHH:MM:SS  (ISO 8601, local time)               */
+const ACCESS_EXPIRY = new Date('2026-10-12T23:59:59').getTime();
 
-function isSessionValid() {
-    try {
-        const expiry = localStorage.getItem('aryanExpiry');
-        const user   = localStorage.getItem('aryanUser');
-        if (!user || !expiry) return false;
-        if (Date.now() > parseInt(expiry, 10)) {
-            localStorage.removeItem('aryanUser');
-            localStorage.removeItem('aryanDisplayName');
-            localStorage.removeItem('aryanExpiry');
-            return false;
-        }
-        return true;
-    } catch (err) {
-        return false;
-    }
+/* In-memory session flag — cleared on every page reload */
+let sessionActive = false;
+
+/* Check if current time is BEFORE expiry */
+function isAccessAllowed() {
+    return Date.now() < ACCESS_EXPIRY;
 }
 
 function handleLogin(e) {
     e.preventDefault();
+
+    /* === Block login if expired === */
+    if (!isAccessAllowed()) {
+        document.getElementById('loginError').textContent =
+            'Access expired on ' +
+            new Date(ACCESS_EXPIRY).toLocaleString() +
+            '. Please contact Rupesh Vaidya.';
+        return false;
+    }
+
     const user = document.getElementById('loginUser').value.trim();
     const pass = document.getElementById('loginPass').value;
     const errEl = document.getElementById('loginError');
@@ -33,12 +36,9 @@ function handleLogin(e) {
 
     const match = USERS.find(u => u.username === user && u.password === pass);
     if (match) {
-        try {
-            localStorage.setItem('aryanUser', match.username);
-            localStorage.setItem('aryanDisplayName', match.displayName || match.username);
-            localStorage.setItem('aryanExpiry', String(SESSION_EXPIRY));
-        } catch (err) { /* ignore */ }
+        sessionActive = true;   /* only in memory — lost on reload */
         document.getElementById('loginOverlay').classList.add('hidden');
+
         const sel = document.getElementById('preparedBy');
         if (sel) {
             for (let i = 0; i < sel.options.length; i++) {
@@ -56,11 +56,7 @@ function handleLogin(e) {
 }
 
 function logout() {
-    try {
-        localStorage.removeItem('aryanUser');
-        localStorage.removeItem('aryanDisplayName');
-        localStorage.removeItem('aryanExpiry');
-    } catch (err) { /* ignore */ }
+    sessionActive = false;
     document.getElementById('loginOverlay').classList.remove('hidden');
     document.getElementById('loginUser').value = '';
     document.getElementById('loginPass').value = '';
@@ -68,22 +64,27 @@ function logout() {
     document.getElementById('loginUser').focus();
 }
 
-// Auto-restore session if still valid (persists across browser restarts until 12-10-2026)
-(function autoRestore() {
-    if (isSessionValid()) {
-        document.getElementById('loginOverlay').classList.add('hidden');
-        try {
-            const displayName = localStorage.getItem('aryanDisplayName');
-            const sel = document.getElementById('preparedBy');
-            if (sel && displayName) {
-                for (let i = 0; i < sel.options.length; i++) {
-                    if (sel.options[i].value === displayName) {
-                        sel.selectedIndex = i;
-                        break;
-                    }
-                }
-            }
-        } catch (err) { /* ignore */ }
+/* On page load — no auto-restore. User must always log in fresh. */
+(function initialCheck() {
+    if (!isAccessAllowed()) {
+        /* Expired — lock the form entirely */
+        const overlay = document.getElementById('loginOverlay');
+        const loginForm = document.getElementById('loginForm');
+        const errEl = document.getElementById('loginError');
+
+        if (loginForm) loginForm.style.display = 'none';
+        if (errEl) {
+            errEl.style.fontSize = '1rem';
+            errEl.style.padding = '20px';
+            errEl.style.background = '#fee2e2';
+            errEl.style.borderRadius = '10px';
+            errEl.style.border = '1px solid #b91c1c';
+            errEl.textContent =
+                'This survey form has expired on ' +
+                new Date(ACCESS_EXPIRY).toLocaleDateString() +
+                '. Please contact Rupesh Vaidya for a new link.';
+        }
+        if (overlay) overlay.classList.remove('hidden');
     } else {
         document.getElementById('loginUser').focus();
     }
@@ -485,8 +486,8 @@ function logout() {
         clone.querySelectorAll('.btn-group, .status-toast').forEach(el => el.remove());
         const pdfTitle = buildPdfTitle();
         const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${pdfTitle}</title>
-        <style>${document.querySelector('style') ? document.querySelector('style').innerHTML : ''}</style>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+        <link rel="stylesheet" href="style.css">
         </head><body>${clone.outerHTML}</body></html>`;
         const blob = new Blob([html], { type: 'text/html' });
         const url = URL.createObjectURL(blob);
