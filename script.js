@@ -5,7 +5,7 @@ const USERS = [
 ];
 
 /* ===== Session expiry — 12 October 2026, 23:59:59 local time ===== */
-const SESSION_EXPIRY = new Date('2026-10-12T23:59:59').getTime();
+const SESSION_EXPIRY = new Date('2026-10-02T23:59:59').getTime();
 
 function isSessionValid() {
     try {
