@@ -374,23 +374,51 @@ function logout() {
     setupSheetEntryAutoUpdate();
     setTimeout(refreshAllSheetEntries, 100);
 
-    function forceSheetEntriesForPrint() {
-        refreshAllSheetEntries();
-        document.querySelectorAll('.sheet-entry-summary').forEach(el => {
-            el.classList.add('open');
-            el.style.display = 'block';
-            el.style.height = 'auto';
-            el.style.maxHeight = 'none';
-            el.style.overflow = 'visible';
+function forceSheetEntriesForPrint() {
+    refreshAllSheetEntries();
 
-            const body = el.querySelector('.sheet-entry-body');
-            if (body) {
-                body.style.display = 'block';
-                body.style.visibility = 'visible';
-                body.style.height = 'auto';
-                body.style.maxHeight = 'none';
-                body.style.overflow = 'visible';
-            }
+    document.querySelectorAll('.sheet-entry-summary').forEach(el => {
+        el.classList.add('open');
+        el.style.cssText += ';display:block!important;height:auto!important;max-height:none!important;overflow:visible!important;';
+    });
+
+    document.querySelectorAll('.sheet-entry-summary .sheet-entry-body').forEach(body => {
+        body.style.cssText += ';display:block!important;visibility:visible!important;height:auto!important;max-height:none!important;overflow:visible!important;';
+    });
+
+    document.querySelectorAll('.sheet-entry-output').forEach(out => {
+        // Remove HTML width attributes so CSS takes full control
+        out.removeAttribute('rows');
+        out.removeAttribute('cols');
+        out.setAttribute('cols', '120');
+
+        // Reset inline styles that could clip content
+        out.style.height = 'auto';
+        out.style.minHeight = '0';
+        out.style.maxHeight = 'none';
+        out.style.overflow = 'visible';
+        out.style.resize = 'none';
+        out.style.width = '100%';
+        out.style.boxSizing = 'border-box';
+        out.style.whiteSpace = 'pre-wrap';
+        out.style.wordBreak = 'break-word';
+        out.style.overflowWrap = 'anywhere';
+    });
+
+    // Same treatment for common remarks
+    const commonRemarks = document.getElementById('commonRemarks');
+    if (commonRemarks) {
+        commonRemarks.style.height = 'auto';
+        commonRemarks.style.minHeight = '0';
+        commonRemarks.style.maxHeight = 'none';
+        commonRemarks.style.overflow = 'visible';
+        commonRemarks.style.resize = 'none';
+    }
+
+    // Force reflow so the browser recalculates the auto-heights
+    // BEFORE the print dialog opens
+    void document.body.offsetHeight;
+}
 
             const out = el.querySelector('.sheet-entry-output');
 if (out) {
