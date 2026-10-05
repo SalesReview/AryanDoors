@@ -393,17 +393,22 @@ function logout() {
             }
 
             const out = el.querySelector('.sheet-entry-output');
-            if (out) {
-                out.removeAttribute('rows');
-                out.style.display = 'block';
-                out.style.visibility = 'visible';
-                out.style.height = 'auto';
-                out.style.minHeight = '0';
-                out.style.maxHeight = 'none';
-                out.style.overflow = 'visible';
-                out.style.resize = 'none';
-                out.style.height = out.scrollHeight + 'px';
-            }
+if (out) {
+  out.removeAttribute('rows');
+  out.removeAttribute('cols');          // <-- ADD THIS
+  out.setAttribute('cols', '120');      // <-- ADD THIS
+  out.style.width = '100%';             // <-- ADD THIS
+  out.style.maxWidth = '100%';          // <-- ADD THIS
+  out.style.boxSizing = 'border-box';   // <-- ADD THIS
+  out.style.display = 'block';
+  out.style.visibility = 'visible';
+  out.style.height = 'auto';
+  out.style.minHeight = '0';
+  out.style.maxHeight = 'none';
+  out.style.overflow = 'visible';
+  out.style.resize = 'none';
+  out.style.height = out.scrollHeight + 'px';
+}
         });
         const commonRemarks = document.getElementById('commonRemarks');
         if (commonRemarks) {
