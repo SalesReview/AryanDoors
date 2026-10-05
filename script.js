@@ -1,34 +1,36 @@
+/* ============================================================
+   ARYAN DOORS — TECHNICAL & SITE SURVEY FORM
+   Complete Script
+   ============================================================ */
+
 /* ================= LOGIN SYSTEM ================= */
 /* Add more users below. Each entry: { username: 'xxx', password: 'yyy', displayName: 'Full Name' } */
 const USERS = [
     { username: 'Rupesh', password: 'Rupesh@123', displayName: 'Rupesh Vaidya' },
 ];
 
-/* ===== Access expiry — after this date/time, login is BLOCKED =====
-   Change the date below to set a new expiry.
-   Format: YYYY-MM-DDTHH:MM:SS  (ISO 8601, local time)               */
-const ACCESS_EXPIRY = new Date('2026-11-07T23:59:59').getTime();
+/* ===== Session expiry — 12 October 2026, 23:59:59 local time ===== */
+const SESSION_EXPIRY = new Date('2026-10-12T23:59:59').getTime();
 
-/* In-memory session flag — cleared on every page reload */
-let sessionActive = false;
-
-/* Check if current time is BEFORE expiry */
-function isAccessAllowed() {
-    return Date.now() < ACCESS_EXPIRY;
+function isSessionValid() {
+    try {
+        const expiry = localStorage.getItem('aryanExpiry');
+        const user = localStorage.getItem('aryanUser');
+        if (!user || !expiry) return false;
+        if (Date.now() > parseInt(expiry, 10)) {
+            localStorage.removeItem('aryanUser');
+            localStorage.removeItem('aryanDisplayName');
+            localStorage.removeItem('aryanExpiry');
+            return false;
+        }
+        return true;
+    } catch (err) {
+        return false;
+    }
 }
 
 function handleLogin(e) {
     e.preventDefault();
-
-    /* === Block login if expired === */
-    if (!isAccessAllowed()) {
-        document.getElementById('loginError').textContent =
-            'Access expired on ' +
-            new Date(ACCESS_EXPIRY).toLocaleString() +
-            '. Please contact Rupesh Vaidya.';
-        return false;
-    }
-
     const user = document.getElementById('loginUser').value.trim();
     const pass = document.getElementById('loginPass').value;
     const errEl = document.getElementById('loginError');
@@ -36,9 +38,12 @@ function handleLogin(e) {
 
     const match = USERS.find(u => u.username === user && u.password === pass);
     if (match) {
-        sessionActive = true;   /* only in memory — lost on reload */
+        try {
+            localStorage.setItem('aryanUser', match.username);
+            localStorage.setItem('aryanDisplayName', match.displayName || match.username);
+            localStorage.setItem('aryanExpiry', String(SESSION_EXPIRY));
+        } catch (err) { /* ignore */ }
         document.getElementById('loginOverlay').classList.add('hidden');
-
         const sel = document.getElementById('preparedBy');
         if (sel) {
             for (let i = 0; i < sel.options.length; i++) {
@@ -56,7 +61,11 @@ function handleLogin(e) {
 }
 
 function logout() {
-    sessionActive = false;
+    try {
+        localStorage.removeItem('aryanUser');
+        localStorage.removeItem('aryanDisplayName');
+        localStorage.removeItem('aryanExpiry');
+    } catch (err) { /* ignore */ }
     document.getElementById('loginOverlay').classList.remove('hidden');
     document.getElementById('loginUser').value = '';
     document.getElementById('loginPass').value = '';
@@ -64,34 +73,29 @@ function logout() {
     document.getElementById('loginUser').focus();
 }
 
-/* On page load — no auto-restore. User must always log in fresh. */
-(function initialCheck() {
-    if (!isAccessAllowed()) {
-        /* Expired — lock the form entirely */
-        const overlay = document.getElementById('loginOverlay');
-        const loginForm = document.getElementById('loginForm');
-        const errEl = document.getElementById('loginError');
-
-        if (loginForm) loginForm.style.display = 'none';
-        if (errEl) {
-            errEl.style.fontSize = '1rem';
-            errEl.style.padding = '20px';
-            errEl.style.background = '#fee2e2';
-            errEl.style.borderRadius = '10px';
-            errEl.style.border = '1px solid #b91c1c';
-            errEl.textContent =
-                'This survey form has expired on ' +
-                new Date(ACCESS_EXPIRY).toLocaleDateString() +
-                '. Please contact Rupesh Vaidya for a new link.';
-        }
-        if (overlay) overlay.classList.remove('hidden');
+// Auto-restore session if still valid (persists across browser restarts until 12-10-2026)
+(function autoRestore() {
+    if (isSessionValid()) {
+        document.getElementById('loginOverlay').classList.add('hidden');
+        try {
+            const displayName = localStorage.getItem('aryanDisplayName');
+            const sel = document.getElementById('preparedBy');
+            if (sel && displayName) {
+                for (let i = 0; i < sel.options.length; i++) {
+                    if (sel.options[i].value === displayName) {
+                        sel.selectedIndex = i;
+                        break;
+                    }
+                }
+            }
+        } catch (err) { /* ignore */ }
     } else {
         document.getElementById('loginUser').focus();
     }
 })();
 
 /* ================= MAIN FORM ================= */
-(function() {
+(function () {
     function generateEntryId() {
         const now = new Date();
         const year = now.getFullYear();
@@ -130,10 +134,10 @@ function logout() {
 
     function buildPdfTitle() {
         const project = (val('projectName') || '').trim();
-        const client  = (val('clientName')  || '').trim();
+        const client = (val('clientName') || '').trim();
         const parts = [];
         if (project) parts.push(project);
-        if (client)  parts.push(client);
+        if (client) parts.push(client);
         let base = parts.join(' - ') || 'AryanDoors_Survey';
         base = base.replace(/[\\\/:*?"<>|\r\n\t]+/g, ' ').replace(/\s+/g, ' ').trim();
         if (base.length > 120) base = base.substring(0, 120).trim();
@@ -205,10 +209,10 @@ function logout() {
         const doorLabel = doorName ? `${doorCode} - ${doorName}` : doorCode;
         parts.push(doorLabel);
 
-        const desc  = (val(prefix + '_description') || '').trim();
-        const size  = (val(prefix + '_size')        || '').trim();
-        const unit  = (val(prefix + '_unit')        || '').trim();
-        const rate  = (val(prefix + '_rate')        || '').trim();
+        const desc = (val(prefix + '_description') || '').trim();
+        const size = (val(prefix + '_size') || '').trim();
+        const unit = (val(prefix + '_unit') || '').trim();
+        const rate = (val(prefix + '_rate') || '').trim();
         if (desc) parts.push(`Description - ${desc}`);
         if (size) parts.push(`Size - ${size}`);
         if (unit) parts.push(`Unit - ${unit}`);
@@ -240,11 +244,11 @@ function logout() {
     }
 
     function refreshAllSheetEntries() {
-        ['d1','d2','d3'].forEach(prefix => refreshSheetEntry(prefix));
+        ['d1', 'd2', 'd3'].forEach(prefix => refreshSheetEntry(prefix));
     }
     window.refreshAllSheetEntries = refreshAllSheetEntries;
 
-    window.toggleSheetEntry = function(prefix) {
+    window.toggleSheetEntry = function (prefix) {
         const el = document.querySelector(`.sheet-entry-summary[data-door="${prefix}"]`);
         if (!el) return;
         el.classList.toggle('open');
@@ -253,7 +257,7 @@ function logout() {
         }
     };
 
-    window.refreshSheetEntry = function(prefix) {
+    window.refreshSheetEntry = function (prefix) {
         const out = document.getElementById(prefix + '_sheetEntry');
         if (out) {
             out.dataset.manuallyEdited = '';
@@ -262,7 +266,7 @@ function logout() {
         }
     };
 
-    window.copySheetEntry = function(prefix, btn) {
+    window.copySheetEntry = function (prefix, btn) {
         const out = document.getElementById(prefix + '_sheetEntry');
         if (!out) return;
         const text = out.value;
@@ -289,7 +293,7 @@ function logout() {
     };
 
     document.querySelectorAll('.sheet-entry-output').forEach(ta => {
-        ta.addEventListener('input', function() {
+        ta.addEventListener('input', function () {
             if (this.value !== this.dataset.autoValue) {
                 this.dataset.manuallyEdited = 'true';
             } else {
@@ -337,7 +341,7 @@ function logout() {
             const wrap = document.querySelector(`.other-input-wrap[data-group="${group}"]`);
             const textInput = wrap ? wrap.querySelector('.other-text') : null;
             const label = toggle.closest('label');
-            toggle.addEventListener('change', function() {
+            toggle.addEventListener('change', function () {
                 if (this.checked) {
                     if (wrap) wrap.classList.add('show');
                     if (label) label.classList.add('other-ticked');
@@ -374,84 +378,73 @@ function logout() {
     setupSheetEntryAutoUpdate();
     setTimeout(refreshAllSheetEntries, 100);
 
-function forceSheetEntriesForPrint() {
-    refreshAllSheetEntries();
+    /* ================= PRINT PREPARATION ================= */
+    function forceSheetEntriesForPrint() {
+        refreshAllSheetEntries();
 
-    document.querySelectorAll('.sheet-entry-summary').forEach(el => {
-        el.classList.add('open');
-        el.style.cssText += ';display:block!important;height:auto!important;max-height:none!important;overflow:visible!important;';
-    });
-
-    document.querySelectorAll('.sheet-entry-summary .sheet-entry-body').forEach(body => {
-        body.style.cssText += ';display:block!important;visibility:visible!important;height:auto!important;max-height:none!important;overflow:visible!important;';
-    });
-
-    document.querySelectorAll('.sheet-entry-output').forEach(out => {
-        // Remove HTML width attributes so CSS takes full control
-        out.removeAttribute('rows');
-        out.removeAttribute('cols');
-        out.setAttribute('cols', '120');
-
-        // Reset inline styles that could clip content
-        out.style.height = 'auto';
-        out.style.minHeight = '0';
-        out.style.maxHeight = 'none';
-        out.style.overflow = 'visible';
-        out.style.resize = 'none';
-        out.style.width = '100%';
-        out.style.boxSizing = 'border-box';
-        out.style.whiteSpace = 'pre-wrap';
-        out.style.wordBreak = 'break-word';
-        out.style.overflowWrap = 'anywhere';
-    });
-
-    // Same treatment for common remarks
-    const commonRemarks = document.getElementById('commonRemarks');
-    if (commonRemarks) {
-        commonRemarks.style.height = 'auto';
-        commonRemarks.style.minHeight = '0';
-        commonRemarks.style.maxHeight = 'none';
-        commonRemarks.style.overflow = 'visible';
-        commonRemarks.style.resize = 'none';
-    }
-
-    // Force reflow so the browser recalculates the auto-heights
-    // BEFORE the print dialog opens
-    void document.body.offsetHeight;
-}
-
-            const out = el.querySelector('.sheet-entry-output');
-if (out) {
-  out.removeAttribute('rows');
-  out.removeAttribute('cols');          // <-- ADD THIS
-  out.setAttribute('cols', '120');      // <-- ADD THIS
-  out.style.width = '100%';             // <-- ADD THIS
-  out.style.maxWidth = '100%';          // <-- ADD THIS
-  out.style.boxSizing = 'border-box';   // <-- ADD THIS
-  out.style.display = 'block';
-  out.style.visibility = 'visible';
-  out.style.height = 'auto';
-  out.style.minHeight = '0';
-  out.style.maxHeight = 'none';
-  out.style.overflow = 'visible';
-  out.style.resize = 'none';
-  out.style.height = out.scrollHeight + 'px';
-}
+        // Open all collapsible summaries
+        document.querySelectorAll('.sheet-entry-summary').forEach(el => {
+            el.classList.add('open');
+            el.style.display = 'block';
+            el.style.height = 'auto';
+            el.style.maxHeight = 'none';
+            el.style.overflow = 'visible';
         });
+
+        document.querySelectorAll('.sheet-entry-summary .sheet-entry-body').forEach(body => {
+            body.style.display = 'block';
+            body.style.visibility = 'visible';
+            body.style.height = 'auto';
+            body.style.maxHeight = 'none';
+            body.style.overflow = 'visible';
+        });
+
+        // Reset sheet-entry textareas: no scroll, full width, auto height
+        document.querySelectorAll('.sheet-entry-output').forEach(out => {
+            out.removeAttribute('rows');
+            out.removeAttribute('cols');
+            out.setAttribute('cols', '120');
+            out.style.width = '100%';
+            out.style.boxSizing = 'border-box';
+            out.style.display = 'block';
+            out.style.visibility = 'visible';
+            out.style.height = 'auto';
+            out.style.minHeight = '0';
+            out.style.maxHeight = 'none';
+            out.style.overflow = 'visible';
+            out.style.resize = 'none';
+            out.style.whiteSpace = 'pre-wrap';
+            out.style.wordBreak = 'break-word';
+            out.style.overflowWrap = 'anywhere';
+        });
+
+        // Common remarks — no scroll, auto height
         const commonRemarks = document.getElementById('commonRemarks');
         if (commonRemarks) {
             commonRemarks.style.height = 'auto';
+            commonRemarks.style.minHeight = '0';
             commonRemarks.style.maxHeight = 'none';
             commonRemarks.style.overflow = 'visible';
             commonRemarks.style.resize = 'none';
-            commonRemarks.style.height = commonRemarks.scrollHeight + 'px';
         }
+
+        // Other textareas — no scroll
+        document.querySelectorAll('textarea').forEach(ta => {
+            if (ta.classList.contains('sheet-entry-output')) return;
+            ta.style.maxHeight = 'none';
+            ta.style.overflow = 'visible';
+            ta.style.resize = 'none';
+        });
+
+        // Force reflow so heights are recalculated before print dialog
+        void document.body.offsetHeight;
     }
 
-    window.addEventListener('beforeprint', function() {
+    window.addEventListener('beforeprint', function () {
         forceSheetEntriesForPrint();
     });
 
+    /* ================= TOAST ================= */
     function showToast(message, isError, isInfo) {
         const toast = document.getElementById('statusToast');
         const msgEl = document.getElementById('statusMessage');
@@ -462,7 +455,8 @@ if (out) {
         setTimeout(() => toast.classList.remove('show'), 3500);
     }
 
-    document.getElementById('printBtn').addEventListener('click', function() {
+    /* ================= PRINT BUTTON ================= */
+    document.getElementById('printBtn').addEventListener('click', function () {
         forceSheetEntriesForPrint();
         const pdfName = buildPdfTitle();
         const originalTitle = document.title;
@@ -470,16 +464,20 @@ if (out) {
         document.title = pdfName;
         if (titleEl) titleEl.textContent = pdfName;
         showToast('Opening print dialog... Choose "Save as PDF"', false, true);
+
+        // Wait for layout to settle, re-apply, then print
         setTimeout(() => {
+            forceSheetEntriesForPrint();
             window.print();
             setTimeout(() => {
                 document.title = originalTitle;
                 if (titleEl) titleEl.textContent = originalTitle;
             }, 1000);
-        }, 300);
+        }, 600);
     });
 
-    document.getElementById('submitBtn').addEventListener('click', async function() {
+    /* ================= SUBMIT ================= */
+    document.getElementById('submitBtn').addEventListener('click', async function () {
         const btn = this;
         refreshAllSheetEntries();
         const formData = collectFormData();
@@ -495,7 +493,8 @@ if (out) {
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
         try {
             await fetch(GOOGLE_FORM_URL, {
-                method: 'POST', mode: 'no-cors',
+                method: 'POST',
+                mode: 'no-cors',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: params.toString()
             });
@@ -513,15 +512,23 @@ if (out) {
         }
     });
 
-    document.getElementById('downloadBtn').addEventListener('click', function() {
+    /* ================= DOWNLOAD HTML ================= */
+    document.getElementById('downloadBtn').addEventListener('click', function () {
         forceSheetEntriesForPrint();
         const clone = document.querySelector('.form-container').cloneNode(true);
         clone.querySelectorAll('.btn-group, .status-toast').forEach(el => el.remove());
         const pdfTitle = buildPdfTitle();
+
+        // Grab all <style> blocks in the page to embed into the downloaded HTML
+        const styleBlocks = Array.from(document.querySelectorAll('style'))
+            .map(s => s.innerHTML)
+            .join('\n');
+
         const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${pdfTitle}</title>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-        <link rel="stylesheet" href="style.css">
+        <style>${styleBlocks}</style>
         </head><body>${clone.outerHTML}</body></html>`;
+
         const blob = new Blob([html], { type: 'text/html' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -533,20 +540,22 @@ if (out) {
         URL.revokeObjectURL(url);
     });
 
-    document.getElementById('resetBtn').addEventListener('click', function() {
+    /* ================= RESET ================= */
+    document.getElementById('resetBtn').addEventListener('click', function () {
         if (confirm('Reset all fields? This will clear your entries.')) {
             location.reload();
         }
     });
 
-    document.getElementById('logoutBtn').addEventListener('click', function() {
+    /* ================= LOGOUT ================= */
+    document.getElementById('logoutBtn').addEventListener('click', function () {
         if (confirm('Logout? Unsaved changes will be lost.')) {
             logout();
         }
     });
 
     /* ================= SAVE DATA (.json) ================= */
-    document.getElementById('saveDataBtn').addEventListener('click', function() {
+    document.getElementById('saveDataBtn').addEventListener('click', function () {
         refreshAllSheetEntries();
         const fieldValues = {};
         document.querySelectorAll('input, textarea, select').forEach(el => {
@@ -601,16 +610,16 @@ if (out) {
     });
 
     /* ================= LOAD DATA (.json) ================= */
-    document.getElementById('loadDataBtn').addEventListener('click', function() {
+    document.getElementById('loadDataBtn').addEventListener('click', function () {
         document.getElementById('loadFileInput').click();
     });
 
-    document.getElementById('loadFileInput').addEventListener('change', function(e) {
+    document.getElementById('loadFileInput').addEventListener('change', function (e) {
         const file = e.target.files[0];
         if (!file) return;
 
         const reader = new FileReader();
-        reader.onload = function(event) {
+        reader.onload = function (event) {
             try {
                 const payload = JSON.parse(event.target.result);
                 const fields = payload.fieldValues || payload._allFieldValues || payload;
